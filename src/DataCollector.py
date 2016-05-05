@@ -16,9 +16,6 @@ def main():
 #     data = readFromFile()
     count = 0
     
-#     for i in xrange(len(data['sta'])):
-#         if(data['sta'][i]['prv']!= 2 and data['sta'][i]['prv']!= 3):
-#             data['sta'].pop(i)
             
     for entry in list(data['sta']):
         if(entry['prv'] == 2 or entry['prv']==3):
