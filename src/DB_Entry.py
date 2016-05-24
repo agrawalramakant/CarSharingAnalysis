@@ -20,7 +20,7 @@ def singleton(class_):
 class DB_Entry():
 
     def __init__(self):
-        self.engine = sqal.create_engine('sqlite:///Car_sharing.sqlite', echo=True)
+        self.engine = sqal.create_engine('sqlite:///../resource/Car_sharing.sqlite', echo=True)
         self.session = sessionmaker()
         self.session.configure(bind=self.engine)
         self.s=self.session()

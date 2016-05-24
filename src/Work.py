@@ -10,10 +10,12 @@ from Booked_Cars import Booked_Cars
 from DB_Entry import DB_Entry
 #import json
 import yaml
+import json
 
 
-with open ("sample_data.json", "r") as f:
-    data = yaml.safe_load(f) 
-t=Booked_Cars(data,'16_05_19_16_20')
+with open ("temp.txt", "r") as f:
+    data = json.load(f) 
+list = list(data)
+t=Booked_Cars(list[3],'2016_05_19_16_20')
 ab = DB_Entry()
 ab.Add_entry(t)
