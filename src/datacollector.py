@@ -31,7 +31,7 @@ class DataCollector(object):
     def writeToFile(self,data,tempFile):
         with open(tempFile, 'w') as outfile:
             json.dump(data, outfile)
-        print "writing to file done"
+        print "writing to file done", tempFile
             
     def getMissingCars(self, newData, tempFile):
         missingCars = []
