@@ -6,8 +6,7 @@ Created on 23.04.2016
 import urllib, json
 from crontab import *
 
-def callMe():
-    print "function called"
+
 def main():
     print 'main'
     #init cron
