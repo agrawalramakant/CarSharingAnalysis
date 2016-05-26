@@ -7,6 +7,7 @@ Created on Thu May 12 14:20:05 2016
 import sqlalchemy as sqal
 from sqlalchemy.orm import sessionmaker
 #import Released_Cars
+import logging
 
 def singleton(class_):
   instances = {}
@@ -20,7 +21,25 @@ def singleton(class_):
 class DB_Entry():
 
     def __init__(self):
-        self.engine = sqal.create_engine('sqlite:///../resource/Car_sharing.sqlite', echo=True)
+#         import logging
+
+#         active_db_url = 'postgres://lad_test:lad_test@192.168.62.173/lad_test'
+        
+        db_log_file_name = 'db.log'
+        db_handler_log_level = logging.INFO
+        db_logger_log_level = logging.DEBUG
+        
+        db_handler = logging.FileHandler(db_log_file_name)
+        db_handler.setLevel(db_handler_log_level)
+        
+        db_logger = logging.getLogger('sqlalchemy')
+        db_logger.addHandler(db_handler)
+        db_logger.setLevel(db_logger_log_level)
+        
+#         engine = sqal.create_engine(active_db_url, echo=False)
+        
+        self.engine = sqal.create_engine('sqlite:///../resource/Car_sharing.sqlite', echo=False)
+        self.engine.connect()
         self.session = sessionmaker()
         self.session.configure(bind=self.engine)
         self.s=self.session()

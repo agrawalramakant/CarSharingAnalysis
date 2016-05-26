@@ -10,12 +10,20 @@ import sys
 from datetime import datetime
 import time
 from apscheduler.schedulers.gevent import GeventScheduler
+from Booked_Cars import Booked_Cars 
+#import Released_Cars
+from DB_Entry import DB_Entry
+import traceback
 
 
 
 
 def getFileName( time):
-    path = '..' + os.sep + 'archive' +os.sep
+    temp = time.split('_')
+    path = '..' + os.sep + '..' + os.sep + 'archive' + os.sep + temp[0] + os.sep + temp[1] + os.sep + temp[2] + os.sep
+    # if the path does not exists then create the path
+    if(not os.path.exists(path)):
+        os.makedirs(path)
     return path + 'datafile' + '_' + time + '.txt'
 
 def getTime():
@@ -27,34 +35,48 @@ time_last = getTime()
 def fetchAndSaveData():
     global time_last
     print 'fetcher called'
+    dbEntry = DB_Entry()
     try:
         datacollector = DataCollector()
         time_now = getTime()
         data = datacollector.getCarsData()
         oldDataFile = getFileName(time_last)
+#         data = datacollector.readFromFile()
+#         oldDataFile = "../archive/datafile_2016_5_24_9_7.txt"
         print time_last
         if(os.path.exists(oldDataFile)):
-            missingData = json.dumps(datacollector.getMissingCars(data,oldDataFile))
-            print missingData
+            missingData = datacollector.getMissingCars(data,oldDataFile)
+            for missingEntry in missingData:
+                try:
+                    dbEntry.Add_entry(Booked_Cars(missingEntry, time_now))
+                except:
+                    print '========================================================================================='
+                    print missingEntry
         datacollector.writeToFile(data, getFileName(time_now))
         time_last = time_now
     except:
         print 'exception', sys.exc_info()[0]
+        traceback.print_exc()
 #   write to data base
 
 if __name__ == '__main__':
-#     time_last = getTime()
-#     fetchAndSaveData()
-#     time.sleep(120)
-#     fetchAndSaveData()
-    scheduler = GeventScheduler()
-    scheduler.add_job(fetchAndSaveData, 'interval', minutes=2)
-    g = scheduler.start()  # g is the greenlet that runs the scheduler loop
-    print('Press Ctrl+{0} to exit'.format('Break' if os.name == 'nt' else 'C'))
- 
-    # Execution will block here until Ctrl+C (Ctrl+Break on Windows) is pressed.
-    try:
-        g.join()
-    except (KeyboardInterrupt, SystemExit):
-        pass
-    
+    test = True
+    if test:
+        time_last = getTime()
+        fetchAndSaveData()
+        time.sleep(30)
+        fetchAndSaveData()
+        time.sleep(30)
+        fetchAndSaveData()
+    else:
+        scheduler = GeventScheduler()
+        scheduler.add_job(fetchAndSaveData, 'interval', minutes=10, start_date = datetime.now())
+        g = scheduler.start()  # g is the greenlet that runs the scheduler loop
+        print('Press Ctrl+{0} to exit'.format('Break' if os.name == 'nt' else 'C'))
+        
+        # Execution will block here until Ctrl+C (Ctrl+Break on Windows) is pressed.
+        try:
+            g.join()
+        except (KeyboardInterrupt, SystemExit):
+            pass
+     
