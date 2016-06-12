@@ -6,13 +6,13 @@ Created on Thu May 19 11:35:27 2016
 """
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, Float
+# import DB_Entry as db
 
+import database
 global Base 
 Base = declarative_base()
 class Booked_Cars(Base):
-    
-    def __init__(self,json_file,time):
-        
+    def __init__(self, json_file,time):
         self.Car_lic_No=json_file['vhc'][0]['lic']
         self.Location_X=json_file['loc'][0]
         self.Location_Y=json_file['loc'][0]
@@ -41,7 +41,6 @@ class Booked_Cars(Base):
     Car_type= Column(String)
     Zone_id	= Column(Integer)
     Car_model= Column(String)
-    
-   # def __repr__(self):
-        # return "<Car_daily_data(Car_lic_No='%s', Location_X='%s', Location_Y='%s',Date='%d',Time='%s',Car_provider= '%s',Car_id='%d' , Car_type= '%s',Zone_id='%d',Car_model= '%s',)>" % (self.Car_lic_No, self.Location_X, self.Location_Y, self.Date , self.Time , self.Car_provider ,  self.Car_id , self.Car_type, self.Zone_id , self.Car_model)
-         
+engine = database.getEngine()
+print "got engine ", engine
+Base.metadata.create_all(engine)

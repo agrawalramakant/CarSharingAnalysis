@@ -16,8 +16,9 @@ class Realeased_Cars(Base):
         self.Car_lic_No=json_file['vhc'][0]['lic']
         self.Location_X=json_file['loc'][0]
         self.Location_Y=json_file['loc'][0]
-        self.Date=time[0:9]
-        self.Time=time[9:15]
+        temp = time.split('_')
+        self.Date=int(temp[0])*10000+int(temp[1])*100+int(temp[2])
+        self.Time=int(temp[3])*100+int(temp[4])
         self.Car_provider=json_file['id'][0:2]
         self.Car_id=json_file['id']
         self.Car_type=json_file['vhc'][0]['typ']
@@ -26,7 +27,7 @@ class Realeased_Cars(Base):
     
     __tablename__='Realeased_Cars'
         
-    record_id=Column(Integer, primary_key=True)
+    record_id=Column(Integer, primary_key=True,autoincrement=True)
     Car_lic_No= Column(String)
     Location_X= Column(Float)
     Location_Y= Column(Float)

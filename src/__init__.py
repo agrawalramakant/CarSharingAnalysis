@@ -12,7 +12,7 @@ import time
 from apscheduler.schedulers.gevent import GeventScheduler
 from Booked_Cars import Booked_Cars 
 #import Released_Cars
-from DB_Entry import DB_Entry
+import database as db
 import traceback
 
 
@@ -35,7 +35,6 @@ time_last = getTime()
 def fetchAndSaveData():
     global time_last
     print 'fetcher called'
-    dbEntry = DB_Entry()
     try:
         datacollector = DataCollector()
         time_now = getTime()
@@ -48,7 +47,7 @@ def fetchAndSaveData():
             missingData = datacollector.getMissingCars(data,oldDataFile)
             for missingEntry in missingData:
                 try:
-                    dbEntry.Add_entry(Booked_Cars(missingEntry, time_now))
+                    db.add_entry(Booked_Cars(missingEntry, time_now))
                 except:
                     print '========================================================================================='
                     print missingEntry
@@ -60,7 +59,8 @@ def fetchAndSaveData():
 #   write to data base
 
 if __name__ == '__main__':
-    test = True
+    
+    test = False
     if test:
         time_last = getTime()
         fetchAndSaveData()
@@ -70,7 +70,7 @@ if __name__ == '__main__':
         fetchAndSaveData()
     else:
         scheduler = GeventScheduler()
-        scheduler.add_job(fetchAndSaveData, 'interval', minutes=10, start_date = datetime.now())
+        scheduler.add_job(fetchAndSaveData, 'interval', minutes=10)
         g = scheduler.start()  # g is the greenlet that runs the scheduler loop
         print('Press Ctrl+{0} to exit'.format('Break' if os.name == 'nt' else 'C'))
         
