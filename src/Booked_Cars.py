@@ -44,20 +44,3 @@ class Booked_Cars(Base):
 engine = database.getEngine()
 print "got engine ", engine
 Base.metadata.create_all(engine)
-#     engine = sqal.create_engine('sqlite:///../src/Car_sharing.sqlite', echo=True)
-#     session = sessionmaker()
-#     s=session()
-#     session.configure(bind=engine)
-#     Base.metadata.create_all(engine)
-    
-    
-    #db = Database()
-    #print db , "in booked cars"
-    #session = sessionmaker()
-    #db.session.configure(bind=db.engine)
-    #Base.metadata.create_all(db.engine)
-    
-    
-   # def __repr__(self):
-        # return "<Car_daily_data(Car_lic_No='%s', Location_X='%s', Location_Y='%s',Date='%d',Time='%s',Car_provider= '%s',Car_id='%d' , Car_type= '%s',Zone_id='%d',Car_model= '%s',)>" % (self.Car_lic_No, self.Location_X, self.Location_Y, self.Date , self.Time , self.Car_provider ,  self.Car_id , self.Car_type, self.Zone_id , self.Car_model)
-         

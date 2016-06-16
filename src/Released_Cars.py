@@ -40,7 +40,3 @@ class Realeased_Cars(Base):
     Car_model= Column(String)
     
     
-    
-    def __repr__(self):
-         return "<Car_daily_data(Car_lic_No='%s', Location_X='%s', Location_Y='%s',Date='%d',Time='%s',Car_provider= '%s',Car_id='%d' , Car_type= '%s',Zone_id='%d',Car_model= '%s',)>" % (self.Car_lic_No, self.Location_X, self.Location_Y, self.Date , self.Time , self.Car_provider ,  self.Car_id , self.Car_type, self.Zone_id , self.Car_model)
-         
