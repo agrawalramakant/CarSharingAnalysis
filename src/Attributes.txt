@@ -1,0 +1,12 @@
+Location X 
+location y
+Lic no
+Time
+date
+company
+Car Type
+Car ID
+Address
+Zone ID
+Model
+Fuel Percentage
