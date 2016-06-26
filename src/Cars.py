@@ -11,8 +11,8 @@ from sqlalchemy import Column, Integer, String, Float
 import database
 global Base 
 Base = declarative_base()
-class Booked_Cars(Base):
-    def __init__(self, json_file,time):
+class Cars(Base):
+    def __init__(self, json_file,time,status):
         self.Car_lic_No=json_file['vhc'][0]['lic']
         self.Location_X=json_file['loc'][0]
         self.Location_Y=json_file['loc'][0]
@@ -27,8 +27,8 @@ class Booked_Cars(Base):
         else:
             self.Zone_id=0
         self.Car_model=json_file['vhc'][0]['mdl']
-    
-    __tablename__='Booked_Cars'
+        self.status = status
+    __tablename__='Cars'
     
     record_id=Column(Integer, primary_key=True,autoincrement=True)
     Car_lic_No= Column(String)
@@ -41,6 +41,8 @@ class Booked_Cars(Base):
     Car_type= Column(String)
     Zone_id	= Column(Integer)
     Car_model= Column(String)
+    status = Column(String)
 engine = database.getEngine()
 print "got engine ", engine
 Base.metadata.create_all(engine)
+ 

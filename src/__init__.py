@@ -10,8 +10,7 @@ import sys
 from datetime import datetime
 import time
 from apscheduler.schedulers.gevent import GeventScheduler
-from Booked_Cars import Booked_Cars 
-#import Released_Cars
+from Cars import Cars
 import database as db
 import traceback
 
@@ -34,7 +33,6 @@ time_last = getTime()
 
 def fetchAndSaveData():
     global time_last
-    print 'fetcher called'
     try:
         datacollector = DataCollector()
         time_now = getTime()
@@ -45,12 +43,23 @@ def fetchAndSaveData():
         print time_last
         if(os.path.exists(oldDataFile)):
             missingData = datacollector.getMissingCars(data,oldDataFile)
+            
             for missingEntry in missingData:
                 try:
-                    db.add_entry(Booked_Cars(missingEntry, time_now))
+                    db.add_entry(Cars(missingEntry, time_now, 'B'))
                 except:
                     print '========================================================================================='
+#                     print("Unexpected error:", sys.exc_info()[0])
+                    traceback.print_exc()
                     print missingEntry
+            releasedData = datacollector.getReleasedCars(data,oldDataFile)
+            for releasedEntry in releasedData:
+                try:
+                    db.add_entry(Cars(releasedEntry, time_now, 'R'))
+                except:
+                    print '========================================================================================='
+                    print("Unexpected error:", sys.exc_info()[0])
+                    print releasedEntry
         datacollector.writeToFile(data, getFileName(time_now))
         time_last = time_now
     except:
@@ -70,7 +79,8 @@ if __name__ == '__main__':
         fetchAndSaveData()
     else:
         scheduler = GeventScheduler()
-        scheduler.add_job(fetchAndSaveData, 'interval', minutes=10)
+        fetchAndSaveData()
+        scheduler.add_job(fetchAndSaveData, 'interval', minutes=5)
         g = scheduler.start()  # g is the greenlet that runs the scheduler loop
         print('Press Ctrl+{0} to exit'.format('Break' if os.name == 'nt' else 'C'))
         

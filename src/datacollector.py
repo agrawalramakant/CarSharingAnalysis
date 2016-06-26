@@ -43,7 +43,16 @@ class DataCollector(object):
         print "no of entry in missing cars : ", len(missingCars)    
         return missingCars
         
-        
+    def getReleasedCars(self, newData, tempFile):
+        releasedCars = []
+        oldData = self.loadOldData(tempFile)
+        oldDataList = list(oldData)
+        for newEntry in list(newData):
+            if(newEntry not in oldDataList):
+                releasedCars.append(newEntry)
+        print "no of entry in released cars : ", len(releasedCars)    
+        return releasedCars
+    
     def loadOldData(self, filename):
         with open(filename) as data_file:    
             data = json.load(data_file)
