@@ -37,13 +37,38 @@ class DataCollector(object):
         missingCars = []
         oldData = self.loadOldData(tempFile)
         newDataList = list(newData)
+        for entry in newDataList:
+            try:
+                entry['vhc']
+            except:
+                newDataList.remove(entry)
         for oldEntry in list(oldData):
-            if(oldEntry not in newDataList):
-                missingCars.append(oldEntry)
+            try:
+                if( not any(entry['vhc'][0]['lic'] == oldEntry['vhc'][0]['lic'] for entry in newDataList)):
+                    missingCars.append(oldEntry)
+            except:
+                print(oldEntry)
         print "no of entry in missing cars : ", len(missingCars)    
         return missingCars
         
-        
+    def getReleasedCars(self, newData, tempFile):
+        releasedCars = []
+        oldData = self.loadOldData(tempFile)
+        oldDataList = list(oldData)
+        for entry in oldDataList:
+            try:
+                entry['vhc']
+            except:
+                oldDataList.remove(entry)
+        for newEntry in list(newData):
+            try:
+                if(not any(entry['vhc'][0]['lic'] == newEntry['vhc'][0]['lic'] for entry in oldDataList)):
+                    releasedCars.append(newEntry)
+            except:
+                print(newEntry)
+        print "no of entry in released cars : ", len(releasedCars)    
+        return releasedCars
+    
     def loadOldData(self, filename):
         with open(filename) as data_file:    
             data = json.load(data_file)
