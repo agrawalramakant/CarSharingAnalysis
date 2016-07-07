@@ -30,35 +30,34 @@ def getTime():
     return str(time.year) + '_' + str(time.month) + '_' + str(time.day) + '_' + str(time.hour) + '_' + str(time.minute)
 
 time_last = getTime()
-
+current_booking = {}
 def fetchAndSaveData():
     global time_last
+    global current_booking
     try:
         datacollector = DataCollector()
         time_now = getTime()
         data = datacollector.getCarsData()
         oldDataFile = getFileName(time_last)
-#         data = datacollector.readFromFile()
-#         oldDataFile = "../archive/datafile_2016_5_24_9_7.txt"
         print time_last
         if(os.path.exists(oldDataFile)):
             missingData = datacollector.getMissingCars(data,oldDataFile)
             
             for missingEntry in missingData:
-                try:
-                    db.add_entry(Cars(missingEntry, time_now, 'B'))
+                try:   
+                    db.add_entry(Cars(missingEntry, time_now))
                 except:
-                    print '========================================================================================='
-#                     print("Unexpected error:", sys.exc_info()[0])
+                    print 'Booking========================================================================================='
                     traceback.print_exc()
                     print missingEntry
             releasedData = datacollector.getReleasedCars(data,oldDataFile)
             for releasedEntry in releasedData:
                 try:
-                    db.add_entry(Cars(releasedEntry, time_now, 'R'))
+                    db.updateEntry(releasedEntry, time_now)
                 except:
                     print '========================================================================================='
                     print("Unexpected error:", sys.exc_info()[0])
+                    traceback.print_exc()
                     print releasedEntry
         datacollector.writeToFile(data, getFileName(time_now))
         time_last = time_now
@@ -66,16 +65,22 @@ def fetchAndSaveData():
         print 'exception', sys.exc_info()[0]
         traceback.print_exc()
 #   write to data base
-
+from os import listdir
 if __name__ == '__main__':
+#     
+#     mypath = "C:\\IDP\\reconstruct data"
+#     print (listdir(mypath))
     
-    test = False
+    
+    test = True
+#     data = db.getLastCar('M-DX 6733')
+#     print(data)
     if test:
         time_last = getTime()
         fetchAndSaveData()
-        time.sleep(30)
+        time.sleep(60)
         fetchAndSaveData()
-        time.sleep(30)
+        time.sleep(60)
         fetchAndSaveData()
     else:
         scheduler = GeventScheduler()

@@ -16,6 +16,10 @@ class DataCollector(object):
         for entry in list(data['sta']):
             if(entry['prv'] != 2 and entry['prv'] !=3):
                 data['sta'].remove(entry)
+            try:
+                entry['vhc']
+            except:
+                data['sta'].remove(entry)
         return data['sta']
 
     def readRealData(self):
@@ -37,9 +41,17 @@ class DataCollector(object):
         missingCars = []
         oldData = self.loadOldData(tempFile)
         newDataList = list(newData)
+        for entry in newDataList:
+            try:
+                entry['vhc']
+            except:
+                newDataList.remove(entry)
         for oldEntry in list(oldData):
-            if(oldEntry not in newDataList):
-                missingCars.append(oldEntry)
+            try:
+                if( not any(entry['vhc'][0]['lic'] == oldEntry['vhc'][0]['lic'] for entry in newDataList)):
+                    missingCars.append(oldEntry)
+            except:
+                print(oldEntry)
         print "no of entry in missing cars : ", len(missingCars)    
         return missingCars
         
@@ -47,9 +59,17 @@ class DataCollector(object):
         releasedCars = []
         oldData = self.loadOldData(tempFile)
         oldDataList = list(oldData)
+        for entry in oldDataList:
+            try:
+                entry['vhc']
+            except:
+                oldDataList.remove(entry)
         for newEntry in list(newData):
-            if(newEntry not in oldDataList):
-                releasedCars.append(newEntry)
+            try:
+                if(not any(entry['vhc'][0]['lic'] == newEntry['vhc'][0]['lic'] for entry in oldDataList)):
+                    releasedCars.append(newEntry)
+            except:
+                print(newEntry)
         print "no of entry in released cars : ", len(releasedCars)    
         return releasedCars
     
