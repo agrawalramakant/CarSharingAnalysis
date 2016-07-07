@@ -16,10 +16,6 @@ class DataCollector(object):
         for entry in list(data['sta']):
             if(entry['prv'] != 2 and entry['prv'] !=3):
                 data['sta'].remove(entry)
-            try:
-                entry['vhc']
-            except:
-                data['sta'].remove(entry)
         return data['sta']
 
     def readRealData(self):

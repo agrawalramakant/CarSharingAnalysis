@@ -30,10 +30,8 @@ def getTime():
     return str(time.year) + '_' + str(time.month) + '_' + str(time.day) + '_' + str(time.hour) + '_' + str(time.minute)
 
 time_last = getTime()
-current_booking = {}
 def fetchAndSaveData():
     global time_last
-    global current_booking
     try:
         datacollector = DataCollector()
         time_now = getTime()
@@ -67,14 +65,8 @@ def fetchAndSaveData():
 #   write to data base
 from os import listdir
 if __name__ == '__main__':
-#     
-#     mypath = "C:\\IDP\\reconstruct data"
-#     print (listdir(mypath))
-    
     
     test = True
-#     data = db.getLastCar('M-DX 6733')
-#     print(data)
     if test:
         time_last = getTime()
         fetchAndSaveData()
