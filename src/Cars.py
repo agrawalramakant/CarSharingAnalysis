@@ -11,36 +11,47 @@ from sqlalchemy import Column, Integer, String, Float
 import database
 global Base 
 Base = declarative_base()
-class Booked_Cars(Base):
-    def __init__(self, json_file,time):
+class Cars(Base):
+    def __init__(self, json_file,b_time):
+
         self.Car_lic_No=json_file['vhc'][0]['lic']
-        self.Location_X=json_file['loc'][0]
-        self.Location_Y=json_file['loc'][0]
-        temp = time.split('_')
-        self.Date=int(temp[0])*10000+int(temp[1])*100+int(temp[2])
-        self.Time=int(temp[3])*100+int(temp[4])
         self.Car_provider=json_file['id'][0:2]
         self.Car_id=json_file['id']
         self.Car_type=json_file['vhc'][0]['typ']
-        if 'zid' in json_file:
-            self.Zone_id=json_file['zid']
-        else:
-            self.Zone_id=0
         self.Car_model=json_file['vhc'][0]['mdl']
-    
-    __tablename__='Booked_Cars'
+        self.b_Location_X=json_file['loc'][0]
+        self.b_Location_Y=json_file['loc'][1]
+        if 'zid' in json_file:
+            self.b_Zone_id=json_file['zid']
+        else:
+            self.b_Zone_id=0
+        temp = b_time.split('_')
+        self.b_Date=int(temp[0])*10000+int(temp[1])*100+int(temp[2])
+        self.b_Time=int(temp[3])*100+int(temp[4])
+#         
+        
+    __tablename__='Cars'
     
     record_id=Column(Integer, primary_key=True,autoincrement=True)
     Car_lic_No= Column(String)
-    Location_X= Column(Float)
-    Location_Y= Column(Float)
-    Date =  Column(Integer)
-    Time=Column(Integer)
     Car_provider	=Column(String)
     Car_id	= Column(String)
     Car_type= Column(String)
-    Zone_id	= Column(Integer)
     Car_model= Column(String)
+    b_Location_X= Column(Float)
+    b_Location_Y= Column(Float)
+    b_Zone_id    = Column(Integer)
+    b_Date =  Column(Integer)
+    b_Time=Column(Integer)
+    r_Time=Column(Integer)
+    r_Date =  Column(Integer)
+    r_Zone_id    = Column(Integer)
+    r_Location_X= Column(Float)
+    r_Location_Y= Column(Float)
+    
+   
+        
 engine = database.getEngine()
 print "got engine ", engine
 Base.metadata.create_all(engine)
+ 
