@@ -7,21 +7,19 @@ from collections import Counter
 from sqlalchemy import MetaData, Table
 from sqlalchemy.sql import select, and_
 from sqlalchemy import create_engine
-engine = create_engine('sqlite:///../resource/Car_sharing_new5.sqlite', echo=False)
-from sqlalchemy.orm import sessionmaker
-session = sessionmaker()
-session.configure(bind=engine)
+# engine = create_engine('sqlite:///../resource/Car_sharing_new5.sqlite', echo=False)
+import database as db
 #     
 # def __init__(self, date,star_time,end_time):
 #     
 #     self.date=date
 #     self.start_time=star_time
 #     self.end_time=end_time
-def getEngine():
-    global engine
-    return engine
+# def getEngine():
+#     global engine
+#     return engine
 def get_analysis_info(z_Id,start_Date,end_Date = None,start_Time = None,end_Time = None):
-    eng = getEngine()
+    eng = db.getEngine()
     with eng.connect() as con:
         meta = MetaData(eng)
         cars = Table('Cars', meta, autoload=True)  
@@ -62,5 +60,5 @@ def get_Probability(z_Id,start_Date,end_Date = None,start_Time = None,end_Time =
         prob=zone[1]/total_cars
         zone_prob[zone_no]=float(prob)
     return zone_prob
-# zone_prob=get_Probability(z_Id=4,start_Date=20160621,end_Date=20160629 , start_Time=1051,end_Time=1651)
-# print zone_prob
+zone_prob=get_Probability(z_Id=4,start_Date=20160621,end_Date=20160629 , start_Time=1051,end_Time=1651)
+print zone_prob

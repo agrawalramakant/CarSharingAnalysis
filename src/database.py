@@ -23,7 +23,7 @@ db_logger.addHandler(db_handler)
 db_logger.setLevel(db_logger_log_level)
 
 from sqlalchemy import create_engine
-engine = create_engine('sqlite:///resource/Car_sharing_db.sqlite', echo=False)
+engine = create_engine('sqlite:///resource/Car_sharing_new5.sqlite', echo=False)
 from sqlalchemy.orm import sessionmaker
 session = sessionmaker()
 session.configure(bind=engine)
