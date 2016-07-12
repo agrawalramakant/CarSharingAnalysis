@@ -40,7 +40,6 @@ def fetchAndSaveData():
         print time_last
         if(os.path.exists(oldDataFile)):
             missingData = datacollector.getMissingCars(data,oldDataFile)
-            
             for missingEntry in missingData:
                 try:   
                     db.add_entry(Cars(missingEntry, time_now))
@@ -63,27 +62,30 @@ def fetchAndSaveData():
         print 'exception', sys.exc_info()[0]
         traceback.print_exc()
 #   write to data base
-from os import listdir
+
+def startScheduledExecution(interval):
+    scheduler = GeventScheduler()
+    fetchAndSaveData()
+    scheduler.add_job(fetchAndSaveData, 'interval', minutes=interval)
+    g = scheduler.start()  # g is the greenlet that runs the scheduler loop
+    print('Press Ctrl+{0} to exit'.format('Break' if os.name == 'nt' else 'C'))
+
+    # Execution will block here until Ctrl+C (Ctrl+Break on Windows) is pressed.
+    try:
+        g.join()
+    except (KeyboardInterrupt, SystemExit):
+        pass
 if __name__ == '__main__':
-    
-    test = True
-    if test:
-        time_last = getTime()
-        fetchAndSaveData()
-        time.sleep(60)
-        fetchAndSaveData()
-        time.sleep(60)
-        fetchAndSaveData()
-    else:
-        scheduler = GeventScheduler()
-        fetchAndSaveData()
-        scheduler.add_job(fetchAndSaveData, 'interval', minutes=5)
-        g = scheduler.start()  # g is the greenlet that runs the scheduler loop
-        print('Press Ctrl+{0} to exit'.format('Break' if os.name == 'nt' else 'C'))
-        
-        # Execution will block here until Ctrl+C (Ctrl+Break on Windows) is pressed.
-        try:
-            g.join()
-        except (KeyboardInterrupt, SystemExit):
-            pass
+
+    startScheduledExecution()
+    # test = False
+    # if test:
+    #     time_last = getTime()
+    #     fetchAndSaveData()
+    #     time.sleep(60)
+    #     fetchAndSaveData()
+    #     time.sleep(60)
+    #     fetchAndSaveData()
+    # else:
+
      

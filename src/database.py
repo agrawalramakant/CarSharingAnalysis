@@ -10,7 +10,7 @@ from sqlalchemy.sql.expression import desc
 
 Base = declarative_base()
 time = datetime.now()
-db_log_file_name = '..'+os.sep+ '..'+os.sep+'db'+str(time.year) + '_' + str(time.month) + '_' + str(time.day) + '_' + str(time.hour)  +'.log'
+db_log_file_name =  '..'+os.sep+'db'+str(time.year) + '_' + str(time.month) + '_' + str(time.day) + '_' + str(time.hour)  +'.log'
 print db_log_file_name
 db_handler_log_level = logging.INFO
 db_logger_log_level = logging.DEBUG
@@ -23,7 +23,7 @@ db_logger.addHandler(db_handler)
 db_logger.setLevel(db_logger_log_level)
 
 from sqlalchemy import create_engine
-engine = create_engine('sqlite:///../resource/Car_sharing_db.sqlite', echo=False)
+engine = create_engine('sqlite:///resource/Car_sharing_db.sqlite', echo=False)
 from sqlalchemy.orm import sessionmaker
 session = sessionmaker()
 session.configure(bind=engine)
@@ -60,7 +60,7 @@ def updateEntry(json_file, r_time):
             date = int(temp[0])*10000+int(temp[1])*100+int(temp[2])
             time = int(temp[3])*100+int(temp[4])
             if ((int(date) > int(entry[9]) or int(time) > int(entry[10])) and (int(date)<= int(entry[9])+1)):
-                u= update(cars).where(cars.c.record_id==id).values(r_Location_X=json_file['loc'][0],r_Location_Y = json_file['loc'][1],r_Zone_id = z_id,r_Date = date, r_Time = time)
+                u= update(cars).where(cars.c.record_id==entry[0]).values(r_Location_X=json_file['loc'][0],r_Location_Y = json_file['loc'][1],r_Zone_id = z_id,r_Date = date, r_Time = time)
                 con.execute(u)
         
     

@@ -42,12 +42,23 @@ class DataCollector(object):
                 entry['vhc']
             except:
                 newDataList.remove(entry)
+        testCars = []
         for oldEntry in list(oldData):
             try:
-                if( not any(entry['vhc'][0]['lic'] == oldEntry['vhc'][0]['lic'] for entry in newDataList)):
+#                 if(not any(entry['vhc'][0]['lic'] == oldEntry['vhc'][0]['lic'] for entry in newDataList)):
+#                     testCars.append(oldEntry)
+#                 if(oldEntry not in newDataList):
+#                     testCars.append(oldEntry)
+                isPresent = False
+                for entry in newDataList:
+                    if( entry['vhc'][0]['lic'] == oldEntry['vhc'][0]['lic']):
+                        isPresent = True
+                        break
+                if(not isPresent):
                     missingCars.append(oldEntry)
             except:
                 print(oldEntry)
+#         print "no of mssing cars in any logic", len(testCars)
         print "no of entry in missing cars : ", len(missingCars)    
         return missingCars
         
@@ -60,12 +71,21 @@ class DataCollector(object):
                 entry['vhc']
             except:
                 oldDataList.remove(entry)
+        testCars= []
         for newEntry in list(newData):
             try:
                 if(not any(entry['vhc'][0]['lic'] == newEntry['vhc'][0]['lic'] for entry in oldDataList)):
+                    testCars.append(newEntry)
+                isPresent = False
+                for entry in oldDataList:
+                    if( entry['vhc'][0]['lic'] == newEntry['vhc'][0]['lic']):
+                        isPresent = True
+                        break
+                if(not isPresent):
                     releasedCars.append(newEntry)
             except:
                 print(newEntry)
+        print "no of relased car with any logic:", len(testCars)
         print "no of entry in released cars : ", len(releasedCars)    
         return releasedCars
     
