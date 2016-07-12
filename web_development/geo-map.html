@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Heat Map</title>
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="../js/bootstrap.min.js"></script>
+</head>
+<body>
+<style>
+    #mapid { height: 600px; }
+</style>
+
+<div id="mapid"></div>
+<script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
+<script>
+    var mymap = L.map('mapid').setView([48.1351, 11.5820], 12);
+    L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+        attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+        maxZoom: 18,
+        id: 'avinashmishra.0hne8kfo',
+        accessToken: 'pk.eyJ1IjoiYXZpbmFzaG1pc2hyYSIsImEiOiJjaXEyc3J6aHEwMDRyaHNtMmh4cTI3ZzFtIn0.fBGbQCOCfnOnEoFkKjlScw'
+    }).addTo(mymap);
+
+    var x_desti=[48.13854,48.12723];
+    var y_desti=[11.55643, 11.59136];
+
+
+    for (i=0;i<x_desti.length;i++){
+        var pointB= new L.LatLng(x_desti[i],y_desti[i]);
+
+    var pointA = new L.LatLng(48.14197,  11.57919);
+//    var pointB = new L.LatLng(48.13854, 11.55643),new L.LatLng(48.14197, 11.57919),new L.LatLng(48.13854, 11.55643);
+    var pointList = [pointA, pointB];
+
+    var firstpolyline = new L.Polyline(pointList, {
+        color: 'red',
+        weight: 5,
+        opacity: 0.5,
+        smoothFactor: 1
+
+    });
+        firstpolyline.addTo(mymap);
+   }
+//    //polygon.setStyle({fillColor: '#0000FF'});
+//    for (i=0;i<20;i++){
+////
+//        var car_coordinates = [
+//            {lat: 48.20775-0.006*i, lng: 11.65263},
+//            {lat: 48.20775-0.006*i, lng: 11.43874}
+//
+//        ];
+//        var polygon = L.polygon([car_coordinates
+//        ],{
+//            color: '#ff3399',
+//            fillColor: '#ffffff',
+//            fillOpacity: 0.3
+//        }).addTo(mymap);
+//    }
+//    for (i=0;i<36;i++){
+////
+//        var car_coordinates = [
+//            {lat: 48.20775, lng: 11.65263-0.006*i},
+//            {lat: 48.09064, lng: 11.65263-0.006*i}
+//
+//        ];
+//        var polygon = L.polygon([car_coordinates
+//        ],{
+//            color: '#ff3399',
+//            fillColor: '#ffffff',
+//            fillOpacity: 0.3
+//        }).addTo(mymap);
+//    }
+
+
+</script>
+<div ng-app="myApp" ng-controller="myCtrl">
+
+</div>
+
+<script>
+    var app = angular.module('myApp', []);
+    app.controller('myCtrl', function($scope, $http) {
+        $http.get("welcome.htm")
+                .then(function(response) {
+                    $scope.myWelcome = response.data;
+                });
+    });
+</script>
+
+</body>
+</html>
