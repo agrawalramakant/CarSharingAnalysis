@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 import src
+from multiprocessing import Pool
 
 app = Flask(__name__)
 CORS(app)
@@ -11,7 +12,8 @@ def startDataCollection(interval):
         sch_interval = int(interval)
     except:
         return jsonify({'res': False})
-    src.startScheduledExecution(sch_interval)
+    pool = Pool(processes=1)
+    pool.apply_async(src.startScheduledExecution,[sch_interval])
     return jsonify({'res': True})
 
 @app.route('/stopDataCollection')

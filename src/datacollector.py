@@ -23,8 +23,8 @@ class DataCollector(object):
         data = json.loads(response.read())
         return data
     
-    def readFromFile(self):
-        with open('data.txt') as data_file:    
+    def readFromFile(self, filename):
+        with open(filename) as data_file:
             data = json.load(data_file)
             return data
         
