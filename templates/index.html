@@ -133,6 +133,114 @@
 
           </div>
         </div>
+        <!-- Modal -->
+        <div class="modal fade" id="observedDemandHeatMap" role="dialog">
+          <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+              <div class="modal-header">
+
+                <h4 class="modal-title">Please provide the info</h4>
+              </div>
+              <div class="modal-body">
+                <form class="form-horizontal" name="probabilityForm" novalidate>
+                  <div class="form-group">
+                    <label  class="col-sm-2 control-label"
+                            for="startDate">Start Date:</label>
+                    <div class="col-sm-10">
+                      <input type="text" class="form-control" ng-model="info.startDate"
+                             id="startDate" placeholder="Start Date e.g yyyymmdd" required/>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label"
+                           for="endDate" >End Date:</label>
+                    <div class="col-sm-10">
+                      <input type="text" class="form-control" ng-model="info.endDate"
+                             id="endDate" placeholder="endDate e.g. yyyymmdd"/>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label"
+                           for="startTime" >Start Time*:</label>
+                    <div class="col-sm-10">
+                      <input type="text" class="form-control" ng-model="info.startTime"
+                             id="startTime" placeholder="startTime e.g. hhmm" />
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label"
+                           for="endTime" >End Time:</label>
+                    <div class="col-sm-10">
+                      <input type="text" class="form-control" ng-model="info.endTime"
+                             id="endTime" placeholder="endTime e.g. hhmm"/>
+                    </div>
+                  </div>
+                </form>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-default" ng-click="observedDemandHeatMap(info)" ng-disabled="probabilityForm.$invalid">show</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Modal -->
+        <div class="modal fade" id="bookingPatern" role="dialog">
+          <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+              <div class="modal-header">
+
+                <h4 class="modal-title">Please provide the info</h4>
+              </div>
+              <div class="modal-body">
+                <form class="form-horizontal" name="probabilityForm" novalidate>
+                  <div class="form-group">
+                    <label  class="col-sm-2 control-label"
+                            for="startDate">Start Date:</label>
+                    <div class="col-sm-10">
+                      <input type="text" class="form-control" ng-model="info.startDate"
+                             id="startDate" placeholder="Start Date e.g yyyymmdd" required/>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label"
+                           for="endDate" >End Date:</label>
+                    <div class="col-sm-10">
+                      <input type="text" class="form-control" ng-model="info.endDate"
+                             id="endDate" placeholder="endDate e.g. yyyymmdd"/>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label"
+                           for="startTime" >Start Time*:</label>
+                    <div class="col-sm-10">
+                      <input type="text" class="form-control" ng-model="info.startTime"
+                             id="startTime" placeholder="startTime e.g. hhmm" />
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="col-sm-2 control-label"
+                           for="endTime" >End Time:</label>
+                    <div class="col-sm-10">
+                      <input type="text" class="form-control" ng-model="info.endTime"
+                             id="endTime" placeholder="endTime e.g. hhmm"/>
+                    </div>
+                  </div>
+                </form>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-default" ng-click="bookingPatern(info)" ng-disabled="probabilityForm.$invalid">show</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
         <section class="intro text-center section-padding" id="intro">
           <div class="container">
               <!--<h2 align="left"> Available Tunnel connections</h2>-->

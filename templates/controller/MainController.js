@@ -18,14 +18,14 @@ app.factory('service',  ['$http', function($http) {
                  +data.startTime+"&endTime="+data.endTime+"&zid="+data.zid);
 
         },
-        heatMap: function(data){
+        observedDemandHeatMap: function(data){
             return $http.get(apiRoot+"heatMap?startDate="+data.startDate
             +"&endDate="+data.endDate+"&startTime="
             +data.startTime+"&endTime="+data.endTime);
 
         },
-        getBookingPattern: function(data){
-            return $http.get(apiRoot+"getBookingPattern?startDate="+data.startDate
+        bookingPatern: function(data){
+            return $http.get(apiRoot+"bookingPatern?startDate="+data.startDate
                 +"&endDate="+data.endDate+"&startTime="
                 +data.startTime+"&endTime="+data.endTime);
 
@@ -34,9 +34,6 @@ app.factory('service',  ['$http', function($http) {
 }]);
 
 app.controller("myCtrl", function($scope, service) {
-
-
-
 
     $scope.startDataCollection = function(){
         service.startDataCollection().success(function(data){
@@ -58,17 +55,18 @@ app.controller("myCtrl", function($scope, service) {
         $('#probabilityModal').modal('hide');
     }
 
-    $scope.heatMap = function(info){
-        service.heatMap(info).success(function(data){
+    $scope.observedDemandHeatMap = function(info){
+        service.observedDemandHeatMap(info).success(function(data){
 
         })
+        $('#observedDemandHeatMap').modal('hide');
     }
 
-    $scope.getBookingPattern = function(info){
-        service.getBookingPattern(info).success(function(data){
+    $scope.bookingPatern = function(info){
+        service.bookingPatern(info).success(function(data){
 
         })
-
+        $('#bookingPatern').modal('hide');
     }
     $scope.save = function(){
         console.log($scope.currentConnection.name);
