@@ -26,19 +26,19 @@
             <div class="container">
               <div class="row">
 
-                <div class="col-md-12 text-right navicon">
-                    <button class="btn btn-icon"  style="background-color: Transparent;" data-toggle="modal" data-target="#probabilityModal">
-                        <i class="fa fa-plus-circle fa-4x"  ng-style="{ color:'#3DC9B3'}"></i>
-                    </button>
-                </div>
+                <!--<div class="col-md-12 text-right navicon">-->
+                    <!--<button class="btn btn-icon"  style="background-color: Transparent;" data-toggle="modal" data-target="#probabilityModal">-->
+                        <!--<i class="fa fa-plus-circle fa-4x"  ng-style="{ color:'#3DC9B3'}"></i>-->
+                    <!--</button>-->
+                <!--</div>-->
               </div>
               <div class="row">
                 <div class="col-md-8 col-md-offset-2 text-center inner">
                   <h1 class="animated fadeInDown">{{title}}<span>SSH</span></h1>
                   <p class="animated fadeInUp delay-05s">A gateway to connect to databases on other <em>servers</em> </p>
-                  <button class="btn btn-icon"  style="background-color: Transparent;" ng-click="startDataCollection()">
-                    <i class="fa fa-plus-circle fa-4x"  ng-style="{ color:'#3DC9B3'}"></i>
-                  </button>
+                  <!--<button class="btn btn-icon"  style="background-color: Transparent;" ng-click="startDataCollection()">-->
+                    <!--<i class="fa fa-plus-circle fa-4x"  ng-style="{ color:'#3DC9B3'}"></i>-->
+                  <!--</button>-->
                 </div>
               </div>
               <div class="row">
@@ -48,20 +48,20 @@
               </div>
                 <div class="row " style="margin-top: 10px" >
                     <div class=" col-xs-3 " style=" margin-left: 95px; padding-left: 10px" >
-                        <button class="learn-less-btn" ng-click="heatMap()" >
-                        <a href="https://google.com" > Heat Map</a>
+                        <button class="learn-less-btn" data-toggle="modal" data-target="#observedDemandHeatMapModal">
+                         Heat Map
                         </button>
                     </div>
 
                     <div class=" col-xs-4"  style="margin-left: 62px;" >
-                        <button class="learn-less-btn" ng-click="getBookingPattern()">
-                        <a href="http//google.com" > Booking Patterns</a>
+                        <button class="learn-less-btn" data-toggle="modal" data-target="#bookingPatternModal">
+                         Booking Patterns
                         </button>
                     </div>
 
                     <div class=" col-xs-3">
-                        <button class="learn-less-btn" ng-click="movingProbability()">
-                        <a href="http//google.com"> Cars Movement</a>
+                        <button class="learn-less-btn" data-toggle="modal" data-target="#probabilityModal" >
+                         Cars Movement
                         </button>
                     </div>
                 </div>
@@ -82,42 +82,42 @@
                 <form class="form-horizontal" name="probabilityForm" novalidate>
                   <div class="form-group">
                     <label  class="col-sm-2 control-label"
-                            for="startDate">Start Date:</label>
+                            for="prob_startDate">Start Date:</label>
                     <div class="col-sm-10">
                       <input type="text" class="form-control" ng-model="info.startDate"
-                             id="name" placeholder="Start Date e.g yyyymmdd" required/>
+                             id="prob_startDate" placeholder="Start Date e.g yyyymmdd" required/>
                     </div>
                   </div>
                   <div class="form-group">
                     <label class="col-sm-2 control-label"
-                           for="endDate" >End Date:</label>
+                           for="prob_endDate" >End Date:</label>
                     <div class="col-sm-10">
                       <input type="text" class="form-control" ng-model="info.endDate"
-                             id="address" placeholder="endDate e.g. yyyymmdd"/>
+                             id="prob_endDate" placeholder="endDate e.g. yyyymmdd"/>
                     </div>
                   </div>
                   <div class="form-group">
                     <label class="col-sm-2 control-label"
-                           for="startTime" >Start Time*:</label>
+                           for="prob_startTime" >Start Time*:</label>
                     <div class="col-sm-10">
                       <input type="text" class="form-control" ng-model="info.startTime"
-                             id="username" placeholder="startTime e.g. hhmm" />
+                             id="prob_startTime" placeholder="startTime e.g. hhmm" />
                     </div>
                   </div>
 
                   <div class="form-group">
                     <label class="col-sm-2 control-label"
-                           for="endTime" >End Time:</label>
+                           for="prob_endTime" >End Time:</label>
                     <div class="col-sm-10">
                       <input type="text" class="form-control" ng-model="info.endTime"
-                             id="endTime" placeholder="endTime e.g. hhmm"/>
+                             id="prob_endTime" placeholder="endTime e.g. hhmm"/>
                     </div>
                   </div>
                   <div class="form-group">
                     <label class="col-sm-2 control-label"
                            for="zid" >Zone Id:</label>
                     <div class="col-sm-10">
-                      <input type="passwotextrd" class="form-control" ng-model="info.zid"
+                      <input type="text" class="form-control" ng-model="info.zid"
                              id="zid" placeholder="SSH Key Path"/>
                     </div>
                   </div>
@@ -134,7 +134,7 @@
           </div>
         </div>
         <!-- Modal -->
-        <div class="modal fade" id="observedDemandHeatMap" role="dialog">
+        <div class="modal fade" id="observedDemandHeatMapModal" role="dialog">
           <div class="modal-dialog">
 
             <!-- Modal content-->
@@ -144,51 +144,51 @@
                 <h4 class="modal-title">Please provide the info</h4>
               </div>
               <div class="modal-body">
-                <form class="form-horizontal" name="probabilityForm" novalidate>
+                <form class="form-horizontal" name="observedDemandHeatMapForm" novalidate>
                   <div class="form-group">
                     <label  class="col-sm-2 control-label"
-                            for="startDate">Start Date:</label>
+                            for="hm_startDate">Start Date:</label>
                     <div class="col-sm-10">
                       <input type="text" class="form-control" ng-model="info.startDate"
-                             id="startDate" placeholder="Start Date e.g yyyymmdd" required/>
+                             id="hm_startDate" placeholder="Start Date e.g yyyymmdd" required/>
                     </div>
                   </div>
                   <div class="form-group">
                     <label class="col-sm-2 control-label"
-                           for="endDate" >End Date:</label>
+                           for="hm_endDate" >End Date:</label>
                     <div class="col-sm-10">
                       <input type="text" class="form-control" ng-model="info.endDate"
-                             id="endDate" placeholder="endDate e.g. yyyymmdd"/>
+                             id="hm_endDate" placeholder="endDate e.g. yyyymmdd"/>
                     </div>
                   </div>
                   <div class="form-group">
                     <label class="col-sm-2 control-label"
-                           for="startTime" >Start Time*:</label>
+                           for="hm_startTime" >Start Time*:</label>
                     <div class="col-sm-10">
                       <input type="text" class="form-control" ng-model="info.startTime"
-                             id="startTime" placeholder="startTime e.g. hhmm" />
+                             id="hm_startTime" placeholder="startTime e.g. hhmm" />
                     </div>
                   </div>
 
                   <div class="form-group">
                     <label class="col-sm-2 control-label"
-                           for="endTime" >End Time:</label>
+                           for="hm_endTime" >End Time:</label>
                     <div class="col-sm-10">
                       <input type="text" class="form-control" ng-model="info.endTime"
-                             id="endTime" placeholder="endTime e.g. hhmm"/>
+                             id="hm_endTime" placeholder="endTime e.g. hhmm"/>
                     </div>
                   </div>
                 </form>
               </div>
               <div class="modal-footer">
-                <button type="button" class="btn btn-default" ng-click="observedDemandHeatMap(info)" ng-disabled="probabilityForm.$invalid">show</button>
+                <button type="button" class="btn btn-default" ng-click="observedDemandHeatMap(info)" ng-disabled="observedDemandHeatMapForm.$invalid">show</button>
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
               </div>
             </div>
           </div>
         </div>
         <!-- Modal -->
-        <div class="modal fade" id="bookingPatern" role="dialog">
+        <div class="modal fade" id="bookingPatternModal" role="dialog">
           <div class="modal-dialog">
 
             <!-- Modal content-->
@@ -198,44 +198,44 @@
                 <h4 class="modal-title">Please provide the info</h4>
               </div>
               <div class="modal-body">
-                <form class="form-horizontal" name="probabilityForm" novalidate>
+                <form class="form-horizontal" name="bookingPatternForm" novalidate>
                   <div class="form-group">
                     <label  class="col-sm-2 control-label"
-                            for="startDate">Start Date:</label>
+                            for="bp_startDate">Start Date:</label>
                     <div class="col-sm-10">
                       <input type="text" class="form-control" ng-model="info.startDate"
-                             id="startDate" placeholder="Start Date e.g yyyymmdd" required/>
+                             id="bp_startDate" placeholder="Start Date e.g yyyymmdd" required/>
                     </div>
                   </div>
                   <div class="form-group">
                     <label class="col-sm-2 control-label"
-                           for="endDate" >End Date:</label>
+                           for="bp_endDate" >End Date:</label>
                     <div class="col-sm-10">
                       <input type="text" class="form-control" ng-model="info.endDate"
-                             id="endDate" placeholder="endDate e.g. yyyymmdd"/>
+                             id="bp_endDate" placeholder="endDate e.g. yyyymmdd"/>
                     </div>
                   </div>
                   <div class="form-group">
                     <label class="col-sm-2 control-label"
-                           for="startTime" >Start Time*:</label>
+                           for="bp_startTime" >Start Time*:</label>
                     <div class="col-sm-10">
                       <input type="text" class="form-control" ng-model="info.startTime"
-                             id="startTime" placeholder="startTime e.g. hhmm" />
+                             id="bp_startTime" placeholder="startTime e.g. hhmm" />
                     </div>
                   </div>
 
                   <div class="form-group">
                     <label class="col-sm-2 control-label"
-                           for="endTime" >End Time:</label>
+                           for="bp_endTime" >End Time:</label>
                     <div class="col-sm-10">
                       <input type="text" class="form-control" ng-model="info.endTime"
-                             id="endTime" placeholder="endTime e.g. hhmm"/>
+                             id="bp_endTime" placeholder="endTime e.g. hhmm"/>
                     </div>
                   </div>
                 </form>
               </div>
               <div class="modal-footer">
-                <button type="button" class="btn btn-default" ng-click="bookingPatern(info)" ng-disabled="probabilityForm.$invalid">show</button>
+                <button type="button" class="btn btn-default" ng-click="bookingPattern(info)" ng-disabled="bookingPatternForm.$invalid">show</button>
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
               </div>
             </div>
