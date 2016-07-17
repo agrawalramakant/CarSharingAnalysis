@@ -10,8 +10,10 @@
     <link href='http://fonts.googleapis.com/css?family=Varela+Round' rel='stylesheet' type='text/css'>
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="http://netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+      <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
     <link href="css/styles.css" rel="stylesheet">
     <link href="css/animate.css" rel="stylesheet">
+
         <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
         <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
         <!--[if lt IE 9]>
@@ -242,13 +244,20 @@
           </div>
         </div>
         <section class="intro text-center section-padding" id="intro">
+
           <div class="container">
               <!--<h2 align="left"> Available Tunnel connections</h2>-->
             <div class="row">
-              <div class="col-md-8 col-md-offset-2 wp1">
-                <h1>Available Tunnel connections</h1>
+
+              <!--<div class="col-md-8 col-md-offset-2 wp1">-->
+                  <!--<style>-->
+                      <!--#mapid { height: 600px; }-->
+                  <!--</style>-->
+                <style>#mapid { height: 800px; }</style>
+                <div id="mapid"></div>
                 <!--<p>Sed a lorem quis neque interdum <a href="#">consequat ut sed sem</a>. Duis quis tempor nunc. Interdum et malesuada fames ac ante ipsum primis in faucibus. Praesent id tempor ipsum. Fusce at massa ac nunc porta fringilla sed eget neque. Quisque quis pretium nulla. Fusce eget bibendum neque, vel volutpat augue. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Interdum et malesuada fames ac ante ipsum primis in faucibus.</p>-->
               </div>
+
             </div>
               <!--<table class="table table-striped table-bordered table-condensed">-->
                   <!--<thead>-->
@@ -413,5 +422,6 @@
         <script src="js/scripts.js"></script>
         <!--<script src="js/jquery.flexslider.js"></script>-->
         <script src="js/modernizr.js"></script>
+        <script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
       </body>
     </html>
