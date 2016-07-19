@@ -59,6 +59,8 @@ def movingProbability():
 
     ret = da.getMovingProbability(zone_id= zone_id,start_Date=attr[0], end_Date=attr[1], start_Time=attr[2], end_Time=attr[3],
                                carType=attr[4])
+    if ret is None:
+        return jsonify({'data': False})
     return jsonify({'data':ret})
 
 
@@ -71,19 +73,20 @@ def observedDemandHeatMap():
     print (attr)
     ret = da.getBookingRecords(start_Date=attr[0], end_Date=attr[1], start_Time=attr[2], end_Time=attr[3],carType=attr[4])
     if ret is None:
-        return jsonify({'data': false})
+        return jsonify({'data': False})
     return jsonify({'data':ret})
 
-@app.route('/movingPatern')
+@app.route('/availabilityPatern')
 def movingPatern():
     args = request.args
     attr = getAttributes(args)
     if(attr is None):
         return
+    print(attr)
     ret = da.getBookingRecords(start_Date=attr[0], end_Date=attr[1], start_Time=attr[2], end_Time=attr[3],carType=attr[4])
     return jsonify({'data':ret})
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=9000)
-    # print(da.getMovingProbability(zone_id=10,start_Date=20160707,end_Date=20160707,start_Time=0,end_Time=2400))
+    # print(da.getMovingProbability(start_Date=20160707,end_Date=20160707,start_Time=0,end_Time=2400))
     # da.getBookingRecords(start_Date=20160707,end_Date=20160707,start_Time=0,end_Time=2400,carType=u'dn')
