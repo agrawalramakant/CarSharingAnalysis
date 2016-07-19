@@ -9,7 +9,7 @@ import json
 
 def get_actual_zone_center(entries):
     #13,14,15
-
+    entry_counter=0
     coordinates = {}
     counter = {}
     zid_range = 0
@@ -31,8 +31,11 @@ def get_actual_zone_center(entries):
                 counter[x] = 1
             if(x > zid_range):
                 zid_range = x
+            entry_counter+=1
+        else:    
+            print "i m in else", entry
                         
-    for x in range(1,zid_range):
+    for x in range(1,zid_range+1):
         try:
             #normal coordinates has value till 5 decimal places.
             coordinates[x]["lng"] = round((coordinates[x]["lng"]/counter[x]),5)
@@ -40,8 +43,8 @@ def get_actual_zone_center(entries):
         except:
             pass
     try:
-        coordinates[-1]["lng"] = round((coordinates[-1]["lng"] / len(entries)), 5)
-        coordinates[-1]["lat"] = round((coordinates[-1]["lat"] / len(entries)), 5)
+        coordinates[-1]["lng"] = round((coordinates[-1]["lng"] / entry_counter), 5)
+        coordinates[-1]["lat"] = round((coordinates[-1]["lat"] / entry_counter), 5)
     except:
         pass
                          

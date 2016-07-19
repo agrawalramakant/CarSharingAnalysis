@@ -48,6 +48,14 @@ app.controller("myCtrl", function($scope, service,$rootScope,$location,$window) 
     var max_airport_lng = 11.82077;
     var min_airport_lat = 48.337745;
     var min_airport_lng = 11.744986;
+    var max_garching1_lat = 48.271000;
+    var max_garching1_lng = 11.680500;
+    var min_garching1_lat = 48.258949;
+    var min_garching1_lng = 11.661000;
+    var max_garching2_lat = 48.260631;
+    var max_garching2_lng = 11.638151;
+    var min_garching2_lat = 48.243044;
+    var min_garching2_lng = 11.601713;
 
     var lat_factor = 0.00360;
     var lng_factor = 0.00535;
@@ -220,11 +228,14 @@ app.controller("myCtrl", function($scope, service,$rootScope,$location,$window) 
                     var node = $scope.prob_input[key];
                     if (node['prob'] != 0) {
                         var marker = L.marker([node['lat'], node['lng']],{color:getColor(node['prob']*100/max_prob)});
+                        marker.bindPopup("Probability to zone "+key +" is "+node['prob']/100).openPopup();
                         list_marker.push(marker);
                     }
                 }
             }
-            list_marker.push(L.marker([source_lat,source_lng],{color:'black'}));
+            var source_marker = L.marker([source_lat,source_lng],{color:'black'});
+            source_marker.bindPopup("Source Zone :"+$scope.sourceZone);
+            list_marker.push(source_marker);
             prob_marker_layer = L.featureGroup(list_marker).addTo(map);
             prob_info = L.control();
 
@@ -237,7 +248,7 @@ app.controller("myCtrl", function($scope, service,$rootScope,$location,$window) 
 // method that we will use to update the control based on feature properties passed
             prob_info.update = function (props) {
                 this._div.innerHTML = '<h4>Probability of moving: </h4>' +  (props ?
-                    'From '+$scope.sourceZone+' to '+props.zid+' is <b>'+ props.prob + '</b>'
+                    'From '+$scope.sourceZone+' to '+props.zid+' is <b>'+ props.prob/100 + '</b>'
                         : 'Hover over a line');
             };
 
@@ -255,7 +266,7 @@ app.controller("myCtrl", function($scope, service,$rootScope,$location,$window) 
                 for (var i = 0; i < grades.length; i++) {
                     div.innerHTML += (i==0? '<h4> Probabilities</h4>' :' ')+
                         '<i style="background:' + getColor(grades[i] + 1) + '"></i> ' +
-                        Math.floor((grades[i]*max_prob)/100)  + (grades[i + 1] ? '&ndash;' + Math.floor((grades[i + 1]*max_prob)/100) + '<br>' : '+');
+                        Math.floor((grades[i]*max_prob)/100)/100  + (grades[i + 1] ? '&ndash;' + Math.floor((grades[i + 1]*max_prob)/100)/100 + '<br>' : '+');
                 }
 
                 return div;
@@ -343,6 +354,66 @@ app.controller("myCtrl", function($scope, service,$rootScope,$location,$window) 
                     }
                 });
             idx++;
+            newZone = getCZone(max_garching1_lat, max_garching1_lng, min_garching1_lat, min_garching1_lng);
+
+            zones_dict[idx] = newZone;
+            for (z=0;z<input.length;z++){
+                var lat_orig=input[z]['lat'];
+                var lng_orig=input[z]['lng'];
+                if(lat_orig>newZone['min_lat'] && lat_orig<=newZone['max_lat'] && lng_orig>newZone['min_lng'] && lng_orig<=newZone['max_lng']){
+                    input[z]['zid'] = idx;
+                    newZone['count'] = newZone['count'] + 1;
+                    console.log(x+'is the selected zone');
+                }
+            }
+
+            list_rectangles.push(
+                {
+                    "type": "Feature",
+                    "properties": {'zid':idx, 'count':newZone['count']},
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [[
+                            [newZone['max_lng'], newZone['max_lat']],
+                            [newZone['max_lng'], newZone['min_lat']],
+                            [newZone['min_lng'], newZone['min_lat']],
+                            [newZone['min_lng'], newZone['max_lat']]
+
+                        ]]
+                    }
+                });
+            idx++;
+
+
+            // Garching 2
+            newZone = getCZone(max_garching2_lat, max_garching2_lng, min_garching2_lat, min_garching2_lng);
+
+            zones_dict[idx] = newZone;
+            for (z=0;z<input.length;z++){
+                var lat_orig=input[z]['lat'];
+                var lng_orig=input[z]['lng'];
+                if(lat_orig>newZone['min_lat'] && lat_orig<=newZone['max_lat'] && lng_orig>newZone['min_lng'] && lng_orig<=newZone['max_lng']){
+                    input[z]['zid'] = idx;
+                    newZone['count'] = newZone['count'] + 1;
+                    console.log(x+'is the selected zone');
+                }
+            }
+
+            list_rectangles.push(
+                {
+                    "type": "Feature",
+                    "properties": {'zid':idx, 'count':newZone['count']},
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [[
+                            [newZone['max_lng'], newZone['max_lat']],
+                            [newZone['max_lng'], newZone['min_lat']],
+                            [newZone['min_lng'], newZone['min_lat']],
+                            [newZone['min_lng'], newZone['max_lat']]
+
+                        ]]
+                    }
+                });
 
             // for the geoJSON
             var gridStyle = {
@@ -457,10 +528,7 @@ app.controller("myCtrl", function($scope, service,$rootScope,$location,$window) 
 
 
 
-
-
-
-
+//Garching 1
 
 
 
