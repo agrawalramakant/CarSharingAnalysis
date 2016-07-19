@@ -10,8 +10,9 @@
     <link href='http://fonts.googleapis.com/css?family=Varela+Round' rel='stylesheet' type='text/css'>
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="http://netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
-      <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />
+    <!--<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.css" />-->
     <link href="css/styles.css" rel="stylesheet">
+    <link href="css/leafletMap.css" rel="stylesheet">
     <link href="css/animate.css" rel="stylesheet">
 
         <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -26,32 +27,23 @@
 
           <section class="hero" id="hero">
             <div class="container">
-              <div class="row">
 
-                <!--<div class="col-md-12 text-right navicon">-->
-                    <!--<button class="btn btn-icon"  style="background-color: Transparent;" data-toggle="modal" data-target="#probabilityModal">-->
-                        <!--<i class="fa fa-plus-circle fa-4x"  ng-style="{ color:'#3DC9B3'}"></i>-->
-                    <!--</button>-->
-                <!--</div>-->
-              </div>
               <div class="row">
                 <div class="col-md-8 col-md-offset-2 text-center inner">
-                  <h1 class="animated fadeInDown">{{title}}<span>SSH</span></h1>
-                  <p class="animated fadeInUp delay-05s">A gateway to connect to databases on other <em>servers</em> </p>
-                  <!--<button class="btn btn-icon"  style="background-color: Transparent;" ng-click="startDataCollection()">-->
-                    <!--<i class="fa fa-plus-circle fa-4x"  ng-style="{ color:'#3DC9B3'}"></i>-->
-                  <!--</button>-->
+                  <h1 class="animated fadeInDown">Car Sharing<span>Analysis</span></h1>
+                  <p class="animated fadeInUp delay-05s">An application to see the moving patterns of <em>shared cars</em> </p>
+
                 </div>
               </div>
               <div class="row">
                 <div class="col-md-6 col-md-offset-3 text-center">
-                  <a href="#intro" class="learn-more-btn">Repository</a>
+                  <a class="learn-more-btn" ng-click="clear()">Start</a>
                 </div>
               </div>
                 <div class="row " style="margin-top: 10px" >
                     <div class=" col-xs-3 " style=" margin-left: 95px; padding-left: 10px" >
                         <button class="learn-less-btn" data-toggle="modal" data-target="#observedDemandHeatMapModal">
-                         Heat Map
+                         Booking Heat Map
                         </button>
                     </div>
 
@@ -120,10 +112,16 @@
                            for="zid" >Zone Id:</label>
                     <div class="col-sm-10">
                       <input type="text" class="form-control" ng-model="info.zid"
-                             id="zid" placeholder="SSH Key Path"/>
+                             id="zid" placeholder="zone id"/>
                     </div>
                   </div>
+                  <div class="form-group">
+                        <label class="col-sm-2 control-label">Zone Id:</label>
+                        <div class="col-sm-10">
+                            <select ng-model="info.type" ng-options="key as value for (key,value) in carType"></select>
 
+                        </div>
+                  </div>
 
                 </form>
               </div>
@@ -180,10 +178,17 @@
                              id="hm_endTime" placeholder="endTime e.g. hhmm"/>
                     </div>
                   </div>
+                  <div class="form-group">
+                        <label class="col-sm-2 control-label">Zone Id:</label>
+                        <div class="col-sm-10">
+                            <select ng-model="info.type" ng-options="key as value for (key,value) in carType"></select>
+
+                        </div>
+                  </div>
                 </form>
               </div>
               <div class="modal-footer">
-                <button type="button" class="btn btn-default" ng-click="observedDemandHeatMap(info)" ng-disabled="observedDemandHeatMapForm.$invalid">show</button>
+                <a type="button" class="btn btn-default" ng-click="observedDemandHeatMap(info);" href="#intro" ng-disabled="observedDemandHeatMapForm.$invalid">show</a>
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
               </div>
             </div>
@@ -234,6 +239,13 @@
                              id="bp_endTime" placeholder="endTime e.g. hhmm"/>
                     </div>
                   </div>
+                  <div class="form-group">
+                        <label class="col-sm-2 control-label">Zone Id:</label>
+                        <div class="col-sm-10">
+                            <select ng-model="info.type" ng-options="key as value for (key,value) in carType"></select>
+
+                        </div>
+                  </div>
                 </form>
               </div>
               <div class="modal-footer">
@@ -247,55 +259,42 @@
 
           <div class="container">
               <!--<h2 align="left"> Available Tunnel connections</h2>-->
-            <div class="row">
+            <div class="row" id="themap">
 
-              <!--<div class="col-md-8 col-md-offset-2 wp1">-->
-                  <!--<style>-->
-                      <!--#mapid { height: 600px; }-->
-                  <!--</style>-->
-                <style>#mapid { height: 800px; }</style>
+
+                <style>#mapid { height: 700px; }</style>
                 <div id="mapid"></div>
                 <!--<p>Sed a lorem quis neque interdum <a href="#">consequat ut sed sem</a>. Duis quis tempor nunc. Interdum et malesuada fames ac ante ipsum primis in faucibus. Praesent id tempor ipsum. Fusce at massa ac nunc porta fringilla sed eget neque. Quisque quis pretium nulla. Fusce eget bibendum neque, vel volutpat augue. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Interdum et malesuada fames ac ante ipsum primis in faucibus.</p>-->
               </div>
 
             </div>
-              <!--<table class="table table-striped table-bordered table-condensed">-->
-                  <!--<thead>-->
-                      <!--<tr>-->
-                          <!--<th align="center">Name</th>-->
-                          <!--<th>Host Address</th>-->
-                          <!--<th>Username</th>-->
-                          <!--<th>LocalPort</th>-->
-                          <!--<th>Has Private Key</th>-->
-                          <!--<th>Actions</th>-->
-                      <!--</tr>-->
-                  <!--</thead>-->
-                  <!--<tbody>-->
-                      <!--<tr ng-repeat="conn in connections">-->
-                          <!--<td>{{conn.name}}</td>-->
-                          <!--<td>{{conn.host}}</td>-->
-                          <!--<td>{{conn.username}}</td>-->
-                          <!--<td>{{conn.localport}}</td>-->
-                          <!--<td>{{conn.isAccessKey}}</td>-->
-                          <!--<td>-->
-                              <!--<button ng-click="editConnection(conn)" class="btn btn-xs btn-default" data-toggle="modal" data-target="#myModal">-->
-                                  <!--<i class="fa fa-pencil-square-o align-right"></i>-->
-                              <!--</button>-->
-                              <!--<button type="button" class="btn btn-xs btn-primary"-->
-                                      <!--ng-click="startConnection(conn)" ng-disabled="conn.isAlive">Connect</button>-->
-                              <!--<button type="button" class="btn btn-xs btn-primary"-->
-                                      <!--ng-click="stopConnection(conn)" ng-disabled="!conn.isAlive">Disconnect</button>-->
-                              <!--<button ng-click="deleteConnection(conn.id)" class="btn btn-xs btn-danger">-->
-                              <!--Delete-->
-                              <!--<i class="fa fa-trash-o align-right"></i>-->
-                              <!--</button>-->
+            <div class="row" style="margin-top: 20px;" ng-if="sourceZone">
+                <div class="col-lg-5">
+                </div>
+                <div class="col-lg-2">
+                  <table class="table table-striped table-bordered table-condensed">
+                      <thead>
+                          <tr>
+                              <th>From</th>
+                              <th>To</th>
+                              <th>Probability</th>
+                              <!--<th>LocalPort</th>-->
+                              <!--<th>Has Private Key</th>-->
+                              <!--<th>Actions</th>-->
+                          </tr>
+                      </thead>
+                      <tbody>
+                          <tr ng-repeat="(key,value) in prob_input">
+                              <td>{{sourceZone}}</td>
+                              <td>{{key}}</td>
+                              <td>{{value.prob}}</td>
 
+                          </tr>
 
-                          <!--</td>-->
-                      <!--</tr>-->
-
-                  <!--</tbody>-->
-              <!--</table>-->
+                      </tbody>
+                  </table>
+                </div>
+            </div>
               <a class="btn btn-icon"  style="background-color: Transparent;" href="#hero" >
                   <i class="fa fa-home"  ng-style="{ color:'#3DC9B3'}" align="right">Top</i>
               </a>
@@ -315,38 +314,35 @@
                   <ul class="slides">
                     <li>
                       <div class="col-md-4 wp5">
-                        <img src="img/team-01.png" alt="Team Member">
-                        <h2>Jon Snow</h2>
-                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc ultricies nulla non metus pulvinar imperdiet. Praesent non adipiscing libero.</p>
+                        <img src="img/ramakant_1.jpg" alt="Team Member">
+                        <h2>Ramakant Agrawal</h2>
+                        <p>A travel lover who things life is a journey and everyone in the world is a co-traveller.</p>
                         <div class="social">
                           <ul class="social-buttons">
-                            <li><a href="#" class="social-btn"><i class="fa fa-dribbble"></i></a></li>
-                            <li><a href="#" class="social-btn"><i class="fa fa-twitter"></i></a></li>
-                            <li><a href="#" class="social-btn"><i class="fa fa-envelope"></i></a></li>
+                            <li><a href="https://www.facebook.com/ramakant.agrawal" class="social-btn"><i class="fa fa-facebook"></i></a></li>
+                            <li><a href="mailto:ramakantagrawal@gmail.com" class="social-btn"><i class="fa fa-envelope"></i></a></li>
                           </ul>
                         </div>
                       </div>
 
                       <div class="col-md-4 wp5 delay-05s">
-                        <img src="img/team-02.png" alt="Team Member">
-                        <h2>Cersei Lannister</h2>
+                        <img src="img/szymon.jpg" alt="Team Member">
+                        <h2>Szymon Albinski</h2>
                         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc ultricies nulla non metus pulvinar imperdiet. Praesent non adipiscing libero.</p>
                         <div class="social">
                           <ul class="social-buttons">
-                            <li><a href="#" class="social-btn"><i class="fa fa-dribbble"></i></a></li>
-                            <li><a href="#" class="social-btn"><i class="fa fa-twitter"></i></a></li>
+                            <li><a href="#" class="social-btn"><i class="fa fa-facebook"></i></a></li>
                             <li><a href="#" class="social-btn"><i class="fa fa-envelope"></i></a></li>
                           </ul>
                         </div>
                       </div>
                       <div class="col-md-4 wp5 delay-1s">
-                        <img src="img/team-03.png" alt="Team Member">
-                        <h2>Jamie Lannister</h2>
+                        <img src="img/avinash.jpg" alt="Team Member">
+                        <h2>Avinash Mishra</h2>
                         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc ultricies nulla non metus pulvinar imperdiet. Praesent non adipiscing libero.</p>
                         <div class="social">
                           <ul class="social-buttons">
-                            <li><a href="#" class="social-btn"><i class="fa fa-dribbble"></i></a></li>
-                            <li><a href="#" class="social-btn"><i class="fa fa-twitter"></i></a></li>
+                            <li><a href="https://www.facebook.com/aviraj017" class="social-btn"><i class="fa fa-facebook"></i></a></li>
                             <li><a href="#" class="social-btn"><i class="fa fa-envelope"></i></a></li>
                           </ul>
                         </div>
@@ -360,58 +356,15 @@
           </div>
         </section>
 
-        <section class="dark-bg text-center section-padding contact-wrap" id="contact">
-          <a href="#top" class="up-btn"><i class="fa fa-chevron-up"></i></a>
-          <div class="container">
-            <div class="row">
-              <div class="col-md-12">
-                <h1 class="arrow">Drop us a line</h1>
-              </div>
-            </div>
-            <div class="row contact-details">
-              <div class="col-md-4">
-                <div class="light-box box-hover">
-                  <h2><i class="fa fa-map-marker"></i><span>Address</span></h2>
-                  <p>Level 6, 23 Pitt St, Sydney</p>
-                </div>
-              </div>
-              <div class="col-md-4">
-                <div class="light-box box-hover">
-                  <h2><i class="fa fa-mobile"></i><span>Phone</span></h2>
-                  <p>+61 9 211 3747</p>
-                </div>
-              </div>
-              <div class="col-md-4">
-                <div class="light-box box-hover">
-                  <h2><i class="fa fa-paper-plane"></i><span>Email</span></h2>
-                  <p><a href="#">hey@halcyondays.com</a></p>
-                </div>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-md-12">
-                <ul class="social-buttons">
-                  <li><a href="#" class="social-btn"><i class="fa fa-dribbble"></i></a></li>
-                  <li><a href="#" class="social-btn"><i class="fa fa-twitter"></i></a></li>
-                  <li><a href="#" class="social-btn"><i class="fa fa-envelope"></i></a></li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </section>
         <footer>
           <div class="container">
             <div class="row">
-              <div class="col-md-6">
-                <ul class="legals">
-                  <li><a href="#">Terms &amp; Conditions</a></li>
-                  <li><a href="#">Legals</a></li>
-                </ul>
+
+              <div class="col-md-10 credit">
+                <p>Designed &amp; Developed by Ramakant & Avinash for <a target="_blank" href="https://www.log.wi.tum.de/index.php?id=5"> Logistics and
+                    Supply Chain Management</a></p>
               </div>
-              <div class="col-md-6 credit">
-                <p>Designed &amp; Developed by <a href="http://www.peterfinlan.com/">Peter Finlan</a> exclusively for <a href="http://tympanus.net/codrops/"><em>Codrops</em></a></p>
-              </div>
-            </div>
+
           </div>
         </footer>
         <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
@@ -422,6 +375,7 @@
         <script src="js/scripts.js"></script>
         <!--<script src="js/jquery.flexslider.js"></script>-->
         <script src="js/modernizr.js"></script>
-        <script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>
+        <!--<script src="http://cdn.leafletjs.com/leaflet/v0.7.7/leaflet.js"></script>-->
+        <script src="js/leafletMap.js"></script>
       </body>
     </html>

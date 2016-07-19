@@ -7,51 +7,46 @@ Created on Jul 7, 2016
 
 import json
 
-coordinates={}
-counter = {}
-def get_zone_center(json_data):
-    
-    zid_range = 0   
-    with open(json_data) as json_data:
-        json_file=json.load(json_data)
-#         d=len(json_file["sta"])
-#         points = {"latitude": 0, "longitude": 0}
-        for entry in json_file["sta"]:
-            if 'zid' in entry:
-    #             for x in range(1,33):
-    #                 if entry['zid']==x:
-                x = entry['zid']
-                try:
-                    coordinates[x]["latitude"]
-                except:
-                    coordinates.setdefault(x,{"latitude": 0, "longitude": 0})
-    #             if coordinates[x]["latitude"] is None:
-    #                 coordinates[x]["latitude"] = entry["loc"][0] 
-    #             else:
-                coordinates[x]["latitude"] += entry["loc"][0]
-    #             if coordinates[x]["longitude"] is None:
-    #                 coordinates[x]["longitude"] = entry["loc"][1]        
-    #             else:
-                coordinates[x]["longitude"] += entry["loc"][1]
-                try:
-                    counter[x] += 1
-                except:
-                    counter[x] = 1
-                if(x > zid_range):
-                    zid_range = x
+def get_actual_zone_center(entries):
+    #13,14,15
+
+    coordinates = {}
+    counter = {}
+    zid_range = 0
+    for entry in entries:
+        if entry[13]:
+            x = entry[13]
+            coordinates.setdefault(-1, {"lat": 0, "lng": 0})
+            try:
+                coordinates[x]["lat"]
+            except:
+                coordinates.setdefault(x,{"lat": 0, "lng": 0})
+            coordinates[x]["lat"] += entry[14]
+            coordinates[x]["lng"] += entry[15]
+            coordinates[-1]["lat"] += entry[6]
+            coordinates[-1]["lng"] += entry[7]
+            try:
+                counter[x] += 1
+            except:
+                counter[x] = 1
+            if(x > zid_range):
+                zid_range = x
                         
     for x in range(1,zid_range):
         try:
             #normal coordinates has value till 5 decimal places.
-            coordinates[x]["longitude"] = round((coordinates[x]["longitude"]/counter[x]),5)
-            coordinates[x]["latitude"] = round((coordinates[x]["latitude"]/counter[x]),5)
+            coordinates[x]["lng"] = round((coordinates[x]["lng"]/counter[x]),5)
+            coordinates[x]["lat"] = round((coordinates[x]["lat"]/counter[x]),5)
         except:
             pass
+    try:
+        coordinates[-1]["lng"] = round((coordinates[-1]["lng"] / len(entries)), 5)
+        coordinates[-1]["lat"] = round((coordinates[-1]["lat"] / len(entries)), 5)
+    except:
+        pass
                          
     return(coordinates)
-# json_data='json_data.json'
-# cordi=get_zone_center(json_data)
-# print cordi
+
 
 
         

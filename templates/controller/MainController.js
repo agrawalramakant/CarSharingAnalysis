@@ -18,25 +18,60 @@ app.factory('service',  ['$http', function($http) {
         movingProbability: function(data){
              return $http.get(apiRoot+"movingProbability?startDate="+data.startDate
                  +"&endDate="+data.endDate+"&startTime="
-                 +data.startTime+"&endTime="+data.endTime+"&zid="+data.zid);
+                 +data.startTime+"&endTime="+data.endTime+"&zid="+data.zid+"&type="+data.type);
 
         },
         observedDemandHeatMap: function(data){
-            return $http.get(apiRoot+"heatMap?startDate="+data.startDate
+            return $http.get(apiRoot+"observedDemandHeatMap?startDate="+data.startDate
             +"&endDate="+data.endDate+"&startTime="
-            +data.startTime+"&endTime="+data.endTime);
+            +data.startTime+"&endTime="+data.endTime+"&type="+data.type);
 
         },
-        bookingPatern: function(data){
-            return $http.get(apiRoot+"bookingPatern?startDate="+data.startDate
+        movingPatern: function(data){
+            return $http.get(apiRoot+"movingPatern?startDate="+data.startDate
                 +"&endDate="+data.endDate+"&startTime="
-                +data.startTime+"&endTime="+data.endTime);
+                +data.startTime+"&endTime="+data.endTime+"&type="+data.type);
 
         }
     };
 }]);
 
 app.controller("myCtrl", function($scope, service,$rootScope,$location,$window) {
+
+    var no_Of_Blocks = 41;
+    // city center
+    var max_city_lng = 11.65263;
+    var min_city_lng = 11.43874;
+    var max_city_lat = 48.20775;
+    var min_city_lat = 48.063090;
+    var max_airport_lat = 48.366514;
+    var max_airport_lng = 11.82077;
+    var min_airport_lat = 48.337745;
+    var min_airport_lng = 11.744986;
+
+    var lat_factor = 0.00360;
+    var lng_factor = 0.00535;
+
+    var max_lat = 48.20775;
+    var grid_Line_Color = 'black';
+    var grid_weight = 0.5;
+    c_zone = {'min_lat':0,
+        'max_lat':0,
+        'min_lng':0,
+        'max_lng':0,
+        'count':0}
+
+    $scope.carType = {'dn':'DriveNow','cg':'Car2Go','all':'both'};
+    function getCZone(maxLat, maxLng, minLat, minLng){
+        var tempZone = JSON.parse(JSON.stringify(c_zone))
+        tempZone['max_lat'] = maxLat;
+        tempZone['max_lng'] = maxLng;
+        tempZone['min_lat'] = minLat;
+        tempZone['min_lng'] = minLng;
+        tempZone['count'] = 0;
+        return tempZone;
+    }
+
 
     $scope.startDataCollection = function(){
         service.startDataCollection().success(function(data){
@@ -50,184 +85,382 @@ app.controller("myCtrl", function($scope, service,$rootScope,$location,$window) 
         })
     }
 
-    $scope.movingProbability = function(info){
-
-        service.movingProbability(info).success(function(data){
-
-        })
-        $('#probabilityModal').modal('hide');
-    }
-
-    $scope.observedDemandHeatMap = function(info){
-
-        service.observedDemandHeatMap(info).success(function(data){
-
-       })
-        $('#observedDemandHeatMap').modal('hide');
-    }
 
 
-    $scope.bookingPatern = function(info){
-        service.bookingPatern(info).success(function(data){
-
-        })
-        $('#bookingPatern').modal('hide');
+    function getColor(d){
+        return d > 80 ? 'red' :
+           d > 60  ? 'orange' :
+           d > 40  ? 'yellow' :
+           d > 20  ? 'cyan' :
+                      'blue';
     }
 
 
 
-
-    var mymap = L.map('mapid').setView([48.1351, 11.5820], 12);
+    var map = L.map('mapid').setView([48.1351, 11.5820], 12);
     var baselayer=L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
         attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
         maxZoom: 20,
         id: 'avinashmishra.0hne8kfo',
         accessToken: 'pk.eyJ1IjoiYXZpbmFzaG1pc2hyYSIsImEiOiJjaXEyc3J6aHEwMDRyaHNtMmh4cTI3ZzFtIn0.fBGbQCOCfnOnEoFkKjlScw'
     })
-    baselayer.addTo(mymap);
-    
-    var no_Of_Blocks = 41;
-// city center
-    var max_city_lng = 11.65263;
-    var min_city_lng = 11.43874;
-    var max_city_lat = 48.20775;
-    var min_city_lat = 48.063090;
+    baselayer.addTo(map);
 
-    var lat_factor = 0.00360;
-    var lng_factor = 0.00535;
+    var heatMap_grid_layer;
+    var heatMap_info;
+    var heatMap_legend;
+    var heatMap_points_layer;
 
-    var max_lat = 48.20775;
-    zones_dict = {}
-    zone = {'min_lat':0,
-        'max_lat':0,
-        'min_lng':0,
-        'max_lng':0,
-        'count':0}
-    var grid_Line_Color = 'black';
-    var grid_weight = 0.5;
-//
-//    Airport
-    var max_airport_lat = 48.366514;
-    var max_airport_lng = 11.82077;
-    var min_airport_lat = 48.337745;
-    var min_airport_lng = 11.744986;
-    //airport grid commented
-    // for (i=0;i<9;i++){
-    //     var car_coordinates = [
-    //         {lat: 48.366514-lat_factor*i, lng: 11.744986},
-    //         {lat: 48.366514-lat_factor*i, lng: 11.82077}
-    //
-    //     ];
-    //     var polygon = L.polygon([car_coordinates
-    //     ],{
-    //         color: '#cc99ff',
-    //         fillColor: '#ffffff',
-    //         fillOpacity: 0.3
-    //     }).addTo(mymap);
-    // }
-    // for (i=0;i<15;i++){
-    //     var car_coordinates = [
-    //         {lat: 48.366514, lng: 11.744986+0.00541*i},
-    //         {lat: 48.337745, lng: 11.744986+0.00541*i}
-    //
-    //     ];
-    //     var polygon = L.polygon([car_coordinates
-    //     ],{
-    //         color: '#cc99ff',
-    //         fillColor: '#ffffff',
-    //         fillOpacity: 0.3
-    //     }).addTo(mymap);
-    // }
-
-    var input=[{'lat': 48.065283,'lng': 11.443477,'zid':-1},
-        {'lat': 48.067628,'lng':11.546044,'zid':-1 },
-        {'lat': 48.067241,'lng':11.547678,'zid':-1 },
-        {'lat': 48.06601,'lng':11.549174,'zid':-1 },
-        {'lat': 48.067271,'lng':11.547525,'zid':-1 }
-
-    ];
-
-//    debugger;
-    var idx =0;
-    for(var x =0;x<no_Of_Blocks;x++){
-        for(var y=0;y<no_Of_Blocks;y++){
-            var tempZone = JSON.parse(JSON.stringify(zone))
-            tempZone['max_lat'] = min_city_lat + lat_factor*(x+1);
-            tempZone['max_lng'] = min_city_lng + lng_factor*(y+1);
-            tempZone['min_lat'] = min_city_lat + lat_factor *x;
-            tempZone['min_lng'] = min_city_lng + lng_factor *y;
-            tempZone['count'] = 0;
-            zones_dict[idx] = tempZone;
-
-            var bounds = [[tempZone['max_lat'], tempZone['max_lng']], [tempZone['min_lat'], tempZone['min_lng']]];
-            var rectangle=L.rectangle(bounds, {color: grid_Line_Color, weight: 1,fillOpacity: 0}).addTo(mymap);
-            idx++;
+    var prob_lines_layer;
+    var prob_legend;
+    var prob_info;
+    var prob_marker_layer;
+    $scope.clear = function(){
+        if(map.hasLayer(heatMap_grid_layer)){
+            map.removeLayer(heatMap_grid_layer);
         }
+        if(map.hasLayer(heatMap_points_layer)){
+            map.removeLayer(heatMap_points_layer);
+        }
+        if(map.hasLayer(prob_lines_layer)){
+            map.removeLayer(prob_lines_layer);
+        }
+        if(map.hasLayer(prob_marker_layer)){
+            map.removeLayer(prob_marker_layer);
+        }
+        if(heatMap_info != undefined){
+            map.removeControl(heatMap_info);
+            heatMap_info = undefined;
+        }
+        if(heatMap_legend != undefined){
+            map.removeControl(heatMap_legend);
+            heatMap_legend = undefined
+        }
+        if(prob_info != undefined){
+            map.removeControl(prob_info);
+            prob_info = undefined;
+        }
+        if(prob_legend != undefined){
+            map.removeControl(prob_legend);
+            prob_legend = undefined;
+        }
+
+
     }
-    var tempZone = JSON.parse(JSON.stringify(zone))
-    tempZone['max_lat'] = max_airport_lat;
-    tempZone['max_lng'] = max_airport_lng;
-    tempZone['min_lat'] = min_airport_lat;
-    tempZone['min_lng'] = min_airport_lng;
-    tempZone['count'] = 0;
-    zones_dict[idx] = tempZone;
-    var bounds = [[tempZone['max_lat'], tempZone['max_lng']], [tempZone['min_lat'], tempZone['min_lng']]];
-    var rectangle=L.rectangle(bounds, {color: grid_Line_Color, weight: 1,fillOpacity: 0}).addTo(mymap);
-    // idx++;
-    // var tempZone = JSON.parse(JSON.stringify(zone))
-    // tempZone['max_lat'] = min_city_lat + lat_factor*(x+1);
-    // tempZone['max_lng'] = min_city_lng + lng_factor*(y+1);
-    // tempZone['min_lat'] = min_city_lat + lat_factor *x;
-    // tempZone['min_lng'] = min_city_lng + lng_factor *y;
-    // tempZone['count'] = 0;
-    // zones_dict[idx] = tempZone;
-    // var bounds = [[tempZone['max_lat'], tempZone['max_lng']], [tempZone['min_lat'], tempZone['min_lng']]];
-    // var rectangle=L.rectangle(bounds, {color: grid_Line_Color, weight: 1,fillOpacity: 0}).addTo(mymap);
-    console.log(Object.keys(zones_dict).length);
-    for (var x=0;x<Object.keys(zones_dict).length;x++){
-        var cur_zone = zones_dict[x];
-        for (z=0;z<input.length;z++){
-            var lat_orig=input[z]['lat'];
-            var lng_orig=input[z]['lng'];
-            if(lat_orig>cur_zone['min_lat'] && lat_orig<=cur_zone['max_lat'] && lng_orig>cur_zone['min_lng'] && lng_orig<=cur_zone['max_lng']){
-                input[z]['zid'] = x;
-                cur_zone['count'] = cur_zone['count'] + 1;
-                console.log(x+'is the selected zone');
+    $scope.movingProbability = function(info){
+        $scope.clear();
+        service.movingProbability(info).success(function(response){
+            $scope.prob_input = response.data;
+            $scope.clear();
+            list_lines=[]
+            $scope.sourceZone = info.zid;
+            var source_node = $scope.prob_input[-1];
+            var source_lat = source_node['lat'];
+            var source_lng = source_node['lng'];
+            var max_prob = 0;
+            for(var key in $scope.prob_input){
+                if(key != -1 ) {
+                    var node = $scope.prob_input[key];
+                    if (node['prob'] != 0) {
+                        list_lines.push({
+                            "type": "Feature",
+                            "properties": {'zid': key, 'prob': node['prob']},
+                            "geometry": {
+                                "type": "LineString",
+                                "coordinates": [[source_lng, source_lat], [node['lng'], node['lat']]]
+                            }
+                        })
+                        if (max_prob < node['prob']) {
+                            max_prob = node['prob'];
+                        }
+                    }
+                }
             }
-        }
+
+            function highlightFeature(e) {
+                var layer = e.target;
+
+                layer.setStyle({
+                    color: 'black',
+                    opacity: 0.6
+                });
+
+                if (!L.Browser.ie && !L.Browser.opera) {
+                    layer.bringToFront();
+                }
+                prob_info.update(layer.feature.properties);
+            }
+
+            function resetHighlight(e) {
+                prob_lines_layer.resetStyle(e.target)
+                prob_info.update();
+            }
+
+            function onEachFeature(feature, layer) {
+                layer.on({
+                    mouseover: highlightFeature,
+                    mouseout: resetHighlight
+                });
+            }
+            var min_allowed_prob = 10;
+            var max_allowed_prob = 50;
+
+            max_prob = Math.min(Math.max(max_prob, min_allowed_prob), max_allowed_prob);
+
+            prob_lines_layer = L.geoJson(list_lines,{
+                style: function(feature) {
+                        return {color: getColor(feature.properties.prob*100/max_prob), weight:5}
+                },
+                onEachFeature: onEachFeature
+            }).addTo(map);
+
+            var list_marker = [];
+            for(var key in $scope.prob_input) {
+                if (key != -1) {
+                    var node = $scope.prob_input[key];
+                    if (node['prob'] != 0) {
+                        var marker = L.marker([node['lat'], node['lng']],{color:getColor(node['prob']*100/max_prob)});
+                        list_marker.push(marker);
+                    }
+                }
+            }
+            list_marker.push(L.marker([source_lat,source_lng],{color:'black'}));
+            prob_marker_layer = L.featureGroup(list_marker).addTo(map);
+            prob_info = L.control();
+
+            prob_info.onAdd = function (map) {
+                this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
+                this.update();
+                return this._div;
+            };
+
+// method that we will use to update the control based on feature properties passed
+            prob_info.update = function (props) {
+                this._div.innerHTML = '<h4>Probability of moving: </h4>' +  (props ?
+                    'From '+$scope.sourceZone+' to '+props.zid+' is <b>'+ props.prob + '</b>'
+                        : 'Hover over a line');
+            };
+
+            prob_info.addTo(map);
+
+            prob_legend = L.control({position: 'bottomright'});
+
+            prob_legend.onAdd = function (map) {
+
+                var div = L.DomUtil.create('div', 'info legend'),
+                    grades = [0, 20, 40, 60, 80],
+                    labels = [];
+
+                // loop through our density intervals and generate a label with a colored square for each interval
+                for (var i = 0; i < grades.length; i++) {
+                    div.innerHTML += (i==0? '<h4> Probabilities</h4>' :' ')+
+                        '<i style="background:' + getColor(grades[i] + 1) + '"></i> ' +
+                        Math.floor((grades[i]*max_prob)/100)  + (grades[i + 1] ? '&ndash;' + Math.floor((grades[i + 1]*max_prob)/100) + '<br>' : '+');
+                }
+
+                return div;
+            };
+            prob_legend.addTo(map);
+
+        })
+        $('#probabilityModal').modal('hide');
     }
-    var no_of_HeatMap_Colors = 4;
-    var max_zone_count = 0;
-    for (var x=0;x<Object.keys(zones_dict).length;x++) {
-        if(max_zone_count < zones_dict[x]['count']){
-            max_zone_count = zones_dict[x]['count'];
-        }
-    }
-    color_list = ['green','yellow','orange','red'];
 
 
-    console.log(zones_dict);
-    console.log(input);
+    $scope.observedDemandHeatMap = function(info){
+        $scope.sourceZone = undefined;
+        service.observedDemandHeatMap(info).success(function(response){
+            $scope.clear();
+            input = response.data;
+            var idx =0;
+            zones_dict = {}
+            var list_rectangles = [];
+            var max_zone_count = 0;
+            for(var x =0;x<no_Of_Blocks;x++){
+                for(var y=0;y<no_Of_Blocks;y++){
+                    var newZone = getCZone(min_city_lat + lat_factor*(x+1), min_city_lng + lng_factor*(y+1), min_city_lat + lat_factor *x, min_city_lng + lng_factor *y);
+                    zones_dict[idx] = newZone;
+                    for (z=0;z<input.length;z++){
+                        var lat_orig=input[z]['lat'];
+                        var lng_orig=input[z]['lng'];
+                        if(lat_orig>newZone['min_lat'] && lat_orig<=newZone['max_lat'] && lng_orig>newZone['min_lng'] && lng_orig<=newZone['max_lng']){
+                            input[z]['zid'] = idx;
+                            newZone['count'] = newZone['count'] + 1;
+                            console.log(x+'is the selected zone');
+                        }
+                    }
+                    if(max_zone_count < newZone['count']){
+                        max_zone_count = newZone['count'];
+                    }
+                    var bounds = [[newZone['max_lat'], newZone['max_lng']], [newZone['min_lat'], newZone['min_lng']]];
+                    var rectangle=L.rectangle(bounds, {color: grid_Line_Color, weight: 1,fillOpacity: 0});
+                    // heatMap_grid_layer.addData(
+                    list_rectangles.push(
+                        {
+                            "type": "Feature",
+                            "properties": {'zid':idx, 'count':newZone['count']},
+                            "geometry": {
+                                "type": "Polygon",
+                                "coordinates": [[
+                                    [newZone['max_lng'], newZone['max_lat']],
+                                    [newZone['max_lng'], newZone['min_lat']],
+                                    [newZone['min_lng'], newZone['min_lat']],
+                                    [newZone['min_lng'], newZone['max_lat']]
 
-    for(var x=0;x<input.length;x++){
-        zid = input[x]['zid']
-        var count = zones_dict[zid]['count']
-        percent = count * 100 /max_zone_count;
-        if(percent <25){
-            color = color_list[0];
-        }else if(percent <50){
-            color = color_list[1];
-        }else if(percent <75){
-            color = color_list[2];
-        }else{
-            color = color_list[3];
-        }
-        var circle = L.circle([input[x]['lat'], input[x]['lng']], 5, {
-            color: color,
-//            fillColor: '#f03',
-            fillOpacity: 0.5
-        }).addTo(mymap);
+                                ]]
+                            }
+                        });
+
+                    idx++;
+                }
+            }
+            //Airport
+            newZone = getCZone(max_airport_lat, max_airport_lng, min_airport_lat, min_airport_lng);
+            zones_dict[idx] = newZone;
+            for (z=0;z<input.length;z++){
+                var lat_orig=input[z]['lat'];
+                var lng_orig=input[z]['lng'];
+                if(lat_orig>newZone['min_lat'] && lat_orig<=newZone['max_lat'] && lng_orig>newZone['min_lng'] && lng_orig<=newZone['max_lng']){
+                    input[z]['zid'] = idx;
+                    newZone['count'] = newZone['count'] + 1;
+                    console.log(x+'is the selected zone');
+                }
+            }
+            var airport_idx = idx;
+            list_rectangles.push(
+                {
+                    "type": "Feature",
+                    "properties": {'zid':idx, 'count':newZone['count']},
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [[
+                            [newZone['max_lng'], newZone['max_lat']],
+                            [newZone['max_lng'], newZone['min_lat']],
+                            [newZone['min_lng'], newZone['min_lat']],
+                            [newZone['min_lng'], newZone['max_lat']]
+
+                        ]]
+                    }
+                });
+            idx++;
+
+            // for the geoJSON
+            var gridStyle = {
+                "color": grid_Line_Color,
+                "weight": 1,
+                "opacity": 0.2
+            };
+            function highlightFeature(e) {
+                var layer = e.target;
+
+                layer.setStyle({
+                    weight: 5,
+                    color: '#666',
+                    opacity: 0.6
+                });
+
+                if (!L.Browser.ie && !L.Browser.opera) {
+                    layer.bringToFront();
+                }
+                heatMap_info.update(layer.feature.properties);
+            }
+
+            function resetHighlight(e) {
+                heatMap_grid_layer.resetStyle(e.target)
+                heatMap_info.update();
+            }
+
+            function onEachFeature(feature, layer) {
+                layer.on({
+                    mouseover: highlightFeature,
+                    mouseout: resetHighlight
+                });
+            }
+
+            heatMap_grid_layer = L.geoJson(list_rectangles,{
+                style:gridStyle,
+                onEachFeature: onEachFeature
+            }).addTo(map);
+
+
+            var no_of_HeatMap_Colors = 5;
+            var max_zone_count_allowed = 50;
+            var min_zone_count_allowed = 10;
+            max_zone_count = Math.min(Math.max(max_zone_count, min_zone_count_allowed), max_zone_count_allowed);
+
+            color_list = ['blue', 'cyan', 'yellow','orange','red'];
+            var list_points = []
+            for(var x=0;x<input.length;x++){
+                zid = input[x]['zid']
+                zone = zones_dict[zid]
+                var count = 1;
+                if(zone != undefined){
+                    count = zone['count']
+                }
+                var percent = count * 100 /max_zone_count;
+
+                var circle = L.circle([input[x]['lat'], input[x]['lng']], 5, {
+                    color: getColor(percent),
+        //            fillColor: '#f03',
+                    fillOpacity: 0.5
+                });
+                list_points.push(circle);
+            }
+            heatMap_points_layer = L.featureGroup(list_points).addTo(map);
+            heatMap_info = L.control();
+
+            heatMap_info.onAdd = function (map) {
+                this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
+                this.update();
+                return this._div;
+            };
+
+// method that we will use to update the control based on feature properties passed
+            heatMap_info.update = function (props) {
+                this._div.innerHTML = '<h4>Booked Cars: '+input.length+'</h4>' +  (props ?
+                    '<b>zone no.' + props.zid + '</b><br />' + props.count + ' cars booked '
+                        : 'Hover over a zone');
+            };
+
+            heatMap_info.addTo(map);
+            heatMap_legend = L.control({position: 'bottomright'});
+
+            heatMap_legend.onAdd = function (map) {
+
+                var div = L.DomUtil.create('div', 'info legend'),
+                    grades = [0, 20, 40, 60, 80],
+                    labels = [];
+
+                // loop through our density intervals and generate a label with a colored square for each interval
+                for (var i = 0; i < grades.length; i++) {
+                    div.innerHTML += (i==0? '<h4> No. of Cars</h4>' :' ')+
+                        '<i style="background:' + getColor(grades[i] + 1) + '"></i> ' +
+                        Math.floor((grades[i]*max_zone_count)/100)  + (grades[i + 1] ? '&ndash;' + Math.floor((grades[i + 1]*max_zone_count)/100) + '<br>' : '+');
+                }
+
+                return div;
+            };
+            heatMap_legend.addTo(map);
+       })
+        $('#observedDemandHeatMapModal').modal('hide');
+
     }
+
+
+    $scope.bookingPatern = function(info){
+        $scope.sourceZone = undefined;
+        service.movingPatern(info).success(function(data){
+
+        })
+        $('#bookingPatternModal').modal('hide');
+    }
+
+
+
+
+
+
+
 
 
 
