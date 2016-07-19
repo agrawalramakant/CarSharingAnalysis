@@ -56,7 +56,6 @@ def movingProbability():
     if (attr is None or zone_id == u'undefined'):
         return jsonify({'data':-1})
     print (attr)
-
     ret = da.getMovingProbability(zone_id= zone_id,start_Date=attr[0], end_Date=attr[1], start_Time=attr[2], end_Time=attr[3],
                                carType=attr[4])
     if ret is None:
@@ -81,12 +80,12 @@ def movingPatern():
     args = request.args
     attr = getAttributes(args)
     if(attr is None):
-        return
+        return jsonify({'data': -1})
     print(attr)
-    ret = da.getBookingRecords(start_Date=attr[0], end_Date=attr[1], start_Time=attr[2], end_Time=attr[3],carType=attr[4])
+    ret = da.getAllfiles(start_Date=attr[0], start_Time=attr[2], end_Time=attr[3],carType=attr[4])
     return jsonify({'data':ret})
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=9000)
-    # print(da.getMovingProbability(start_Date=20160707,end_Date=20160707,start_Time=0,end_Time=2400))
+    # print(da.getAllfiles(start_Date=20160707,end_Date=20160707,start_Time=0,end_Time=2400))
     # da.getBookingRecords(start_Date=20160707,end_Date=20160707,start_Time=0,end_Time=2400,carType=u'dn')
