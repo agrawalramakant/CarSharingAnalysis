@@ -20,6 +20,8 @@ def getRecords(start_Date,end_Date = None,start_Time = None,end_Time = None,zone
 
 def getZoneProbability(zone_id,start_Date,end_Date = None,start_Time = None,end_Time = None, carType=None):
     data = getRecords(start_Date=start_Date, end_Date=end_Date,start_Time=start_Time, end_Time=end_Time, zone_id=zone_id, carType= None)
+    if data is None:
+        return None
     r_zone_list=[]
     zone_prob={}
 
@@ -38,6 +40,8 @@ def getMovingProbability(zone_id,start_Date,end_Date = None,start_Time = None,en
     # zone_probability_dict = getZoneProbability(z_Id=4, start_Date=20160621, end_Date=20160629, start_Time=1051, end_Time=1651)
     zone_probability_dict = getZoneProbability(zone_id=zone_id, start_Date=start_Date, end_Date=end_Date, start_Time=start_Time,
                                                end_Time=end_Time, carType=carType)
+    if zone_probability_dict is None:
+        return None
     zone_center = zc.get_actual_zone_center(zone_probability_dict[1])
     moving_prob_dict = {}
     temp = {}
@@ -57,6 +61,8 @@ def getMovingProbability(zone_id,start_Date,end_Date = None,start_Time = None,en
 
 def getBookingRecords(start_Date,end_Date = None,start_Time = None,end_Time = None, carType=None):
     data = getRecords(start_Date=start_Date, end_Date=end_Date, start_Time=start_Time, end_Time=end_Time, carType=carType)
+    if data is None:
+        return None
     bookingLocations = []
     for entry in data:
         bookingLocations.append({'lat':entry[6],'lng':entry[7],'zid': -1})
