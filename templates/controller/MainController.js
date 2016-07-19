@@ -6,6 +6,7 @@ var app = angular.module("mytunnel", [
 ]);
 
 app.factory('service',  ['$http', function($http) {
+    // var apiRoot = "http://10.162.183.64:9000/"
     var apiRoot = "http://localhost:9000/"
     this.info = {};
     return {
@@ -80,8 +81,9 @@ app.controller("myCtrl", function($scope, service,$rootScope,$location,$window) 
         return tempZone;
     }
 
-
+    $scope.mapTitle = '';
     $scope.startDataCollection = function(){
+
         service.startDataCollection().success(function(data){
 
         })
@@ -157,6 +159,7 @@ app.controller("myCtrl", function($scope, service,$rootScope,$location,$window) 
     }
     $scope.movingProbability = function(info){
         $scope.clear();
+        $scope.mapTitle = "Moving Probability of Cars";
         service.movingProbability(info).success(function(response){
             $scope.prob_input = response.data;
             $scope.clear();
@@ -280,6 +283,8 @@ app.controller("myCtrl", function($scope, service,$rootScope,$location,$window) 
 
     $scope.observedDemandHeatMap = function(info){
         $scope.sourceZone = undefined;
+        $scope.clear();
+        $scope.mapTitle = "Observed Demand Heat Map";
         service.observedDemandHeatMap(info).success(function(response){
             $scope.clear();
             input = response.data;
@@ -520,6 +525,8 @@ app.controller("myCtrl", function($scope, service,$rootScope,$location,$window) 
 
     $scope.bookingPatern = function(info){
         $scope.sourceZone = undefined;
+        $scope.clear();
+        $scope.mapTitle = "Booking Pattern";
         service.movingPatern(info).success(function(data){
 
         })

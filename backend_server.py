@@ -29,7 +29,7 @@ def getAttributes(args):
         i_endTime = int(endTime)
     except:
         i_endTime = 2400
-    if carType == u'all':
+    if carType == u'all' or carType == u'undefined':
         carType = None
     return (i_startDate, i_endDate, i_startTime, i_endTime, carType)
 
@@ -52,10 +52,11 @@ def stopDataCollection():
 def movingProbability():
     args = request.args
     attr = getAttributes(args)
-    if (attr is None):
-        return
-    print (attr)
     zone_id = args['zid']
+    if (attr is None or zone_id == u'undefined'):
+        return jsonify({'data':-1})
+    print (attr)
+
     ret = da.getMovingProbability(zone_id= zone_id,start_Date=attr[0], end_Date=attr[1], start_Time=attr[2], end_Time=attr[3],
                                carType=attr[4])
     return jsonify({'data':ret})
@@ -66,9 +67,11 @@ def observedDemandHeatMap():
     args = request.args
     attr = getAttributes(args)
     if (attr is None):
-        return
+        return jsonify({'data': -1})
     print (attr)
     ret = da.getBookingRecords(start_Date=attr[0], end_Date=attr[1], start_Time=attr[2], end_Time=attr[3],carType=attr[4])
+    if ret is None:
+        return jsonify({'data': false})
     return jsonify({'data':ret})
 
 @app.route('/movingPatern')
