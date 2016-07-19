@@ -3,7 +3,7 @@ Created on Jul 8, 2016
 
 @author: avinashchandra
 '''
-from src.prob_model import get_Probability
+from src.dataanalysis import get_Probability
 from src.zone_center import get_zone_center
 # def draw_lines(zone_Id):
 desti_cord={}
