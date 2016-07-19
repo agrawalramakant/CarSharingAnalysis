@@ -78,14 +78,6 @@ def startScheduledExecution(interval):
 if __name__ == '__main__':
 
     startScheduledExecution()
-    # test = False
-    # if test:
-    #     time_last = getTime()
-    #     fetchAndSaveData()
-    #     time.sleep(60)
-    #     fetchAndSaveData()
-    #     time.sleep(60)
-    #     fetchAndSaveData()
-    # else:
+
 
      

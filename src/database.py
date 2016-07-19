@@ -23,7 +23,7 @@ db_logger.addHandler(db_handler)
 db_logger.setLevel(db_logger_log_level)
 
 from sqlalchemy import create_engine
-engine = create_engine('sqlite:///resource/Car_sharing_new5.sqlite', echo=False)
+engine = create_engine('sqlite:///resource/Car_sharing_db.sqlite', echo=False)
 from sqlalchemy.orm import sessionmaker
 session = sessionmaker()
 session.configure(bind=engine)
@@ -87,3 +87,53 @@ def getLast():
         stm = select([cars]).order_by(desc(cars.c.record_id)).limit(1)
         rs = con.execute(stm)
         return rs.fetchall()[0]
+
+def getBookingWithZoneID(z_Id,start_Date,end_Date = None,start_Time = None,end_Time = None,carType=None):
+    eng = getEngine()
+    with eng.connect() as con:
+        meta = MetaData(eng)
+        cars = Table('Cars', meta, autoload=True)
+        if(carType is None):
+            stm = select([cars]).where(and_(cars.c.b_Zone_id==z_Id,
+                                   cars.c.b_Time>=start_Time,
+                                   cars.c.r_Time<=end_Time,
+                                    cars.c.b_Date >= start_Date,
+                                    cars.c.b_Date <= end_Date))
+        else:
+            stm = select([cars]).where(and_(cars.c.b_Zone_id==z_Id,
+                                   cars.c.b_Time>=start_Time,
+                                   cars.c.r_Time<=end_Time,
+                                   cars.c.b_Date>=start_Date,
+                                   cars.c.b_Date<=end_Date),
+                                       cars.c.Car_provider==carType)
+        rs = con.execute(stm)
+        res = rs.fetchall()
+        if len(res) > 0:
+            return res
+        else:
+            return None
+
+def getBookingWithOutZoneID(start_Date,end_Date = None,start_Time = None,end_Time = None, carType=None):
+    eng = getEngine()
+    with eng.connect() as con:
+        meta = MetaData(eng)
+        cars = Table('Cars', meta, autoload=True)
+        if(carType is None):
+            stm = select([cars]).where(and_(
+                                   cars.c.b_Time>=start_Time,
+                                   cars.c.r_Time<=end_Time,
+                                   cars.c.b_Date >= start_Date,
+                                   cars.c.b_Date <= end_Date))
+        else:
+            stm = select([cars]).where(and_(
+                                   cars.c.b_Time>=start_Time,
+                                   cars.c.r_Time<=end_Time,
+                                   cars.c.b_Date>=start_Date,
+                                   cars.c.b_Date<=end_Date,
+                                   cars.c.Car_provider==carType))
+        rs = con.execute(stm)
+        res = rs.fetchall()
+        if len(res) > 0:
+            return res
+        else:
+            return None
