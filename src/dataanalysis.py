@@ -8,6 +8,7 @@ from sqlalchemy import MetaData, Table
 from sqlalchemy.sql import select, and_
 from sqlalchemy import create_engine
 
+import os
 import database as db
 import zone_center as zc
 
@@ -69,9 +70,37 @@ def getBookingRecords(start_Date,end_Date = None,start_Time = None,end_Time = No
     print (len(bookingLocations))
     return bookingLocations
 
+
+def getpath(time):
+    temp = time.split('_')
+    path = '..' + os.sep + '..' + os.sep + 'archive' + os.sep + temp[0] + os.sep + temp[1] + os.sep + temp[2] + os.sep
+    return path
+
 def movingPattern(start_Date,end_Date,start_Time,end_Time):
-    actualStart = start_Date[0:4]+ '_'+start_Date[4:6].lstrip('0') +'_'+ start_Date[6:8].lstrip('0')\
-                    + '_' + start_Time[0:2].lstrip('0') + '_' + start_Time[2:4].lstrip('0')
+
     actualEnd = end_Date[0:4] + '_' + end_Date[4:6].lstrip('0') + '_' + end_Date[6:8].lstrip('0') \
                   + '_' + end_Time[0:2].lstrip('0') + '_' + end_Time[2:4].lstrip('0')
 
+
+def getModifiedDateTime(date, time):
+    start_hour = time[0:2].lstrip('0')
+    if start_hour == u'':
+        start_hour = u'0'
+    start_min = time[2:4].lstrip('0')
+    if start_min == u'':
+        start_min = u'0'
+    modifiedDateTime = date[0:4] + '_' + date[4:6].lstrip('0') + '_' + date[6:8].lstrip('0') \
+                  + '_' + start_hour + '_' + start_min
+    return modifiedDateTime
+
+def getAllfiles(start_Date, start_Time, end_Time, end_Date=None, carType = None):
+
+    actualStart = getModifiedDateTime(str(start_Date),str(start_Time))
+    print actualStart
+    path = getpath(actualStart)
+    if os.path.exists(path):
+        print ("exists")
+    listOfFile = os.listdir(path)
+    for file in listOfFile:
+        print (file)
+    return None

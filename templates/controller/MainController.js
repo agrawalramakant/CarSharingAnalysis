@@ -28,10 +28,15 @@ app.factory('service',  ['$http', function($http) {
             +data.startTime+"&endTime="+data.endTime+"&type="+data.type);
 
         },
-        movingPatern: function(data){
-            return $http.get(apiRoot+"movingPatern?startDate="+data.startDate
-                +"&endDate="+data.endDate+"&startTime="
-                +data.startTime+"&endTime="+data.endTime+"&type="+data.type);
+//        availabilityPatern: function(data){
+//            return $http.get(apiRoot+"availabilityPatern?startDate="+data.startDate
+//                +"&endDate="+data.endDate+"&startTime="
+//                +data.startTime+"&endTime="+data.endTime+"&type="+data.type);
+//
+//        }
+        availabilityPatern: function(data){
+            return $http.get(apiRoot+"availabilityPatern?startDate="+data.startDate
+                +"&startTime="+data.startTime+"&endTime="+data.endTime+"&type="+data.type);
 
         }
     };
@@ -523,11 +528,12 @@ app.controller("myCtrl", function($scope, service,$rootScope,$location,$window) 
     }
 
 
-    $scope.bookingPatern = function(info){
+    $scope.bookingPattern = function(info){
         $scope.sourceZone = undefined;
         $scope.clear();
-        $scope.mapTitle = "Booking Pattern";
-        service.movingPatern(info).success(function(data){
+        $scope.mapTitle = "Booking Pattern"
+        service.availabilityPatern(info).success(function(data){
+
 
         })
         $('#bookingPatternModal').modal('hide');
