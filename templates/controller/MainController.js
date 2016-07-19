@@ -228,13 +228,13 @@ app.controller("myCtrl", function($scope, service,$rootScope,$location,$window) 
                     var node = $scope.prob_input[key];
                     if (node['prob'] != 0) {
                         var marker = L.marker([node['lat'], node['lng']],{color:getColor(node['prob']*100/max_prob)});
-                        marker.bindPopup("Probability to zone "+key +" is "+node['prob']).openPopup();
+                        marker.bindPopup("Probability to zone "+key +" is "+node['prob']/100).openPopup();
                         list_marker.push(marker);
                     }
                 }
             }
             var source_marker = L.marker([source_lat,source_lng],{color:'black'});
-            source_marker.bindPopup("Source Zone :"+sourceZone);
+            source_marker.bindPopup("Source Zone :"+$scope.sourceZone);
             list_marker.push(source_marker);
             prob_marker_layer = L.featureGroup(list_marker).addTo(map);
             prob_info = L.control();
@@ -248,7 +248,7 @@ app.controller("myCtrl", function($scope, service,$rootScope,$location,$window) 
 // method that we will use to update the control based on feature properties passed
             prob_info.update = function (props) {
                 this._div.innerHTML = '<h4>Probability of moving: </h4>' +  (props ?
-                    'From '+$scope.sourceZone+' to '+props.zid+' is <b>'+ props.prob + '</b>'
+                    'From '+$scope.sourceZone+' to '+props.zid+' is <b>'+ props.prob/100 + '</b>'
                         : 'Hover over a line');
             };
 
@@ -266,7 +266,7 @@ app.controller("myCtrl", function($scope, service,$rootScope,$location,$window) 
                 for (var i = 0; i < grades.length; i++) {
                     div.innerHTML += (i==0? '<h4> Probabilities</h4>' :' ')+
                         '<i style="background:' + getColor(grades[i] + 1) + '"></i> ' +
-                        Math.floor((grades[i]*max_prob)/100)  + (grades[i + 1] ? '&ndash;' + Math.floor((grades[i + 1]*max_prob)/100) + '<br>' : '+');
+                        Math.floor((grades[i]*max_prob)/100)/100  + (grades[i + 1] ? '&ndash;' + Math.floor((grades[i + 1]*max_prob)/100)/100 + '<br>' : '+');
                 }
 
                 return div;
