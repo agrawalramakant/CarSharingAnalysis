@@ -37,7 +37,7 @@
               </div>
               <div class="row">
                 <div class="col-md-6 col-md-offset-3 text-center">
-                  <a class="learn-more-btn" ng-click="clear()">Start</a>
+                  <a class="learn-more-btn" ng-click="startDataCollection()">Start</a>
                 </div>
               </div>
                 <div class="row " style="margin-top: 10px" >
@@ -49,7 +49,7 @@
 
                     <div class=" col-xs-4"  style="margin-left: 62px;" >
                         <button class="learn-less-btn" data-toggle="modal" data-target="#bookingPatternModal">
-                         Booking Patterns
+                         Availability Patterns
                         </button>
                     </div>
 
@@ -112,11 +112,11 @@
                            for="zid" >Zone Id:</label>
                     <div class="col-sm-10">
                       <input type="text" class="form-control" ng-model="info.zid"
-                             id="zid" placeholder="zone id"/>
+                             id="zid" placeholder="zone id" required/>
                     </div>
                   </div>
                   <div class="form-group">
-                        <label class="col-sm-2 control-label">Zone Id:</label>
+                        <label class="col-sm-2 control-label">Car Owner</label>
                         <div class="col-sm-10">
                             <select ng-model="info.type" ng-options="key as value for (key,value) in carType"></select>
 
@@ -126,7 +126,7 @@
                 </form>
               </div>
               <div class="modal-footer">
-                <button type="button" class="btn btn-default" ng-click="movingProbability(info)" ng-disabled="probabilityForm.$invalid">show</button>
+                <button type="button" class="btn btn-default" ng-click="movingProbability(info)" href="#intro" ng-disabled="probabilityForm.$invalid">show</button>
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
               </div>
             </div>
@@ -179,7 +179,7 @@
                     </div>
                   </div>
                   <div class="form-group">
-                        <label class="col-sm-2 control-label">Zone Id:</label>
+                        <label class="col-sm-2 control-label">Car Owner</label>
                         <div class="col-sm-10">
                             <select ng-model="info.type" ng-options="key as value for (key,value) in carType"></select>
 
@@ -210,23 +210,23 @@
                     <label  class="col-sm-2 control-label"
                             for="bp_startDate">Start Date:</label>
                     <div class="col-sm-10">
-                      <input type="text" class="form-control" ng-model="info.startDate"
+                      <input type="text" class="form-control" ng-model="av_info.startDate"
                              id="bp_startDate" placeholder="Start Date e.g yyyymmdd" required/>
                     </div>
                   </div>
-                  <div class="form-group">
-                    <label class="col-sm-2 control-label"
-                           for="bp_endDate" >End Date:</label>
-                    <div class="col-sm-10">
-                      <input type="text" class="form-control" ng-model="info.endDate"
-                             id="bp_endDate" placeholder="endDate e.g. yyyymmdd"/>
-                    </div>
-                  </div>
+                  <!--<div class="form-group">-->
+                    <!--<label class="col-sm-2 control-label"-->
+                           <!--for="bp_endDate" >End Date:</label>-->
+                    <!--<div class="col-sm-10">-->
+                      <!--<input type="text" class="form-control" ng-model="av_info.endDate"-->
+                             <!--id="bp_endDate" placeholder="endDate e.g. yyyymmdd"/>-->
+                    <!--</div>-->
+                  <!--</div>-->
                   <div class="form-group">
                     <label class="col-sm-2 control-label"
                            for="bp_startTime" >Start Time*:</label>
                     <div class="col-sm-10">
-                      <input type="text" class="form-control" ng-model="info.startTime"
+                      <input type="text" class="form-control" ng-model="av_info.startTime"
                              id="bp_startTime" placeholder="startTime e.g. hhmm" />
                     </div>
                   </div>
@@ -235,21 +235,21 @@
                     <label class="col-sm-2 control-label"
                            for="bp_endTime" >End Time:</label>
                     <div class="col-sm-10">
-                      <input type="text" class="form-control" ng-model="info.endTime"
+                      <input type="text" class="form-control" ng-model="av_info.endTime"
                              id="bp_endTime" placeholder="endTime e.g. hhmm"/>
                     </div>
                   </div>
                   <div class="form-group">
-                        <label class="col-sm-2 control-label">Zone Id:</label>
+                        <label class="col-sm-2 control-label">Car Owner</label>
                         <div class="col-sm-10">
-                            <select ng-model="info.type" ng-options="key as value for (key,value) in carType"></select>
+                            <select ng-model="av_info.type" ng-options="key as value for (key,value) in carType"></select>
 
                         </div>
                   </div>
                 </form>
               </div>
               <div class="modal-footer">
-                <button type="button" class="btn btn-default" ng-click="bookingPattern(info)" ng-disabled="bookingPatternForm.$invalid">show</button>
+                <button type="button" class="btn btn-default" ng-click="availabilityPattern(av_info)" href="#intro" ng-disabled="bookingPatternForm.$invalid">show</button>
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
               </div>
             </div>
@@ -259,11 +259,13 @@
 
           <div class="container">
               <h1 align="left"> {{mapTitle}}</h1>
+
             <div class="row" id="themap">
 
 
                 <style>#mapid { height: 700px; }</style>
                 <div id="mapid"></div>
+
                 <!--<p>Sed a lorem quis neque interdum <a href="#">consequat ut sed sem</a>. Duis quis tempor nunc. Interdum et malesuada fames ac ante ipsum primis in faucibus. Praesent id tempor ipsum. Fusce at massa ac nunc porta fringilla sed eget neque. Quisque quis pretium nulla. Fusce eget bibendum neque, vel volutpat augue. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Interdum et malesuada fames ac ante ipsum primis in faucibus.</p>-->
               </div>
 
@@ -295,9 +297,20 @@
                   </table>
                 </div>
             </div>
-              <a class="btn btn-icon"  style="background-color: Transparent;" href="#hero" >
+            <div class="row">
+              <div class=" col-sm-4">
+
+              </div>
+              <div class="col-sm-4">
+                <a class="btn btn-icon"  style="background-color: Transparent;" href="#hero" >
                   <i class="fa fa-home"  ng-style="{ color:'#3DC9B3'}" align="right">Top</i>
+
               </a>
+              </div>
+              <div class="col-sm-2">
+                <button type="button" class="btn btn-primary" ng-click="stopAnimation(av_info)" ng-if="drawInterval" align="left">Stop Animation</button>
+              </div>
+
           </div>
         </section>
 

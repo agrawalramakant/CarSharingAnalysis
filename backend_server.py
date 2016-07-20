@@ -36,12 +36,12 @@ def getAttributes(args):
 @app.route('/startDataCollection/<interval>', methods=['POST'])
 def startDataCollection(interval):
     #TODO remove the comment later on
-    # try:
-    #     sch_interval = int(interval)
-    # except:
-    #     return jsonify({'res': False})
-    # pool = Pool(processes=1)
-    # pool.apply_async(src.startScheduledExecution,[sch_interval])
+    try:
+        sch_interval = int(interval)
+    except:
+        return jsonify({'res': False})
+    pool = Pool(processes=1)
+    pool.apply_async(src.startScheduledExecution,[sch_interval])
     return jsonify({'res': True})
 
 @app.route('/stopDataCollection')
@@ -75,7 +75,7 @@ def observedDemandHeatMap():
         return jsonify({'data': False})
     return jsonify({'data':ret})
 
-@app.route('/availabilityPatern')
+@app.route('/availabilityPattern')
 def movingPatern():
     args = request.args
     attr = getAttributes(args)
@@ -83,9 +83,23 @@ def movingPatern():
         return jsonify({'data': -1})
     print(attr)
     ret = da.getAllfiles(start_Date=attr[0], start_Time=attr[2], end_Time=attr[3],carType=attr[4])
+    if ret is None:
+        return jsonify({'data':False})
     return jsonify({'data':ret})
 
+@app.route('/getJson')
+def getJson():
+    args = request.args
+    file = args['file']
+    if file == u'undefined':
+        return jsonify({'data':-1})
+    carType = args['type']
+    if carType == u'all' or carType == u'undefined':
+        carType = None
+
+    json = da.getLatLngJson(filename=file, carType=carType)
+    return jsonify({'data':json})
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=9000)
-    # print(da.getAllfiles(start_Date=20160707,end_Date=20160707,start_Time=0,end_Time=2400))
+    # print(da.getAllfiles(start_Date=20160529,end_Date=20160707,start_Time=1000,end_Time=1400))
     # da.getBookingRecords(start_Date=20160707,end_Date=20160707,start_Time=0,end_Time=2400,carType=u'dn')

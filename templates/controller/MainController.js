@@ -34,15 +34,19 @@ app.factory('service',  ['$http', function($http) {
 //                +data.startTime+"&endTime="+data.endTime+"&type="+data.type);
 //
 //        }
-        availabilityPatern: function(data){
-            return $http.get(apiRoot+"availabilityPatern?startDate="+data.startDate
+        availabilityPattern: function(data){
+            return $http.get(apiRoot+"availabilityPattern?startDate="+data.startDate
+                +"&endDate="+data.endDate
                 +"&startTime="+data.startTime+"&endTime="+data.endTime+"&type="+data.type);
 
+        },
+        getJson: function(file,type){
+            return $http.get(apiRoot+"getJson?file="+file+"&type="+type);
         }
     };
 }]);
 
-app.controller("myCtrl", function($scope, service,$rootScope,$location,$window) {
+app.controller("myCtrl", function($scope, service) {
 
     var no_Of_Blocks = 41;
     // city center
@@ -130,6 +134,14 @@ app.controller("myCtrl", function($scope, service,$rootScope,$location,$window) 
     var prob_legend;
     var prob_info;
     var prob_marker_layer;
+    var patt_points_layer;
+    var pattern_info;
+    $scope.drawInterval;
+
+    $scope.stopAnimation = function(){
+        clearInterval($scope.drawInterval);
+        $scope.drawInterval = undefined;
+    }
     $scope.clear = function(){
         if(map.hasLayer(heatMap_grid_layer)){
             map.removeLayer(heatMap_grid_layer);
@@ -142,6 +154,9 @@ app.controller("myCtrl", function($scope, service,$rootScope,$location,$window) 
         }
         if(map.hasLayer(prob_marker_layer)){
             map.removeLayer(prob_marker_layer);
+        }
+        if(map.hasLayer(patt_points_layer)){
+            map.removeLayer(patt_points_layer);
         }
         if(heatMap_info != undefined){
             map.removeControl(heatMap_info);
@@ -159,6 +174,10 @@ app.controller("myCtrl", function($scope, service,$rootScope,$location,$window) 
             map.removeControl(prob_legend);
             prob_legend = undefined;
         }
+        if(pattern_info != undefined){
+            map.removeControl(pattern_info);
+            pattern_info = undefined;
+        }
 
 
     }
@@ -166,120 +185,126 @@ app.controller("myCtrl", function($scope, service,$rootScope,$location,$window) 
         $scope.clear();
         $scope.mapTitle = "Moving Probability of Cars";
         service.movingProbability(info).success(function(response){
-            $scope.prob_input = response.data;
-            $scope.clear();
-            list_lines=[]
-            $scope.sourceZone = info.zid;
-            var source_node = $scope.prob_input[-1];
-            var source_lat = source_node['lat'];
-            var source_lng = source_node['lng'];
-            var max_prob = 0;
-            for(var key in $scope.prob_input){
-                if(key != -1 ) {
-                    var node = $scope.prob_input[key];
-                    if (node['prob'] != 0) {
-                        list_lines.push({
-                            "type": "Feature",
-                            "properties": {'zid': key, 'prob': node['prob']},
-                            "geometry": {
-                                "type": "LineString",
-                                "coordinates": [[source_lng, source_lat], [node['lng'], node['lat']]]
+                $scope.prob_input = response.data;
+                $scope.clear();
+                list_lines=[]
+                $scope.sourceZone = info.zid;
+                var source_node = $scope.prob_input[-1];
+                var source_lat = source_node['lat'];
+                var source_lng = source_node['lng'];
+                var max_prob = 0;
+                var counter =0;
+                for(var key in $scope.prob_input){
+                    if(key != -1 ) {
+                        var node = $scope.prob_input[key];
+                        if (node['prob'] != 0) {
+                            list_lines.push({
+                                "type": "Feature",
+                                "properties": {'zid': key, 'prob': node['prob']},
+                                "geometry": {
+                                    "type": "LineString",
+                                    "coordinates": [[source_lng, source_lat], [node['lng'], node['lat']]]
+                                }
+                            })
+                            if (max_prob < node['prob'] && key != $scope.sourceZone) {
+                                max_prob = max_prob + node['prob'];
+                                counter++;
                             }
-                        })
-                        if (max_prob < node['prob']) {
-                            max_prob = node['prob'];
                         }
                     }
                 }
-            }
+//                max_prob = Math.min(Math.max(max_prob, min_allowed_prob), max_allowed_prob);
+                max_prob = (max_prob *2)/counter;
+                function highlightFeature(e) {
+                    var layer = e.target;
 
-            function highlightFeature(e) {
-                var layer = e.target;
+                    layer.setStyle({
+                        color: 'black',
+                        opacity: 0.6
+                    });
 
-                layer.setStyle({
-                    color: 'black',
-                    opacity: 0.6
-                });
-
-                if (!L.Browser.ie && !L.Browser.opera) {
-                    layer.bringToFront();
+                    if (!L.Browser.ie && !L.Browser.opera) {
+                        layer.bringToFront();
+                    }
+                    prob_info.update(layer.feature.properties);
                 }
-                prob_info.update(layer.feature.properties);
-            }
 
-            function resetHighlight(e) {
-                prob_lines_layer.resetStyle(e.target)
-                prob_info.update();
-            }
+                function resetHighlight(e) {
+                    prob_lines_layer.resetStyle(e.target)
+                    prob_info.update();
+                }
 
-            function onEachFeature(feature, layer) {
-                layer.on({
-                    mouseover: highlightFeature,
-                    mouseout: resetHighlight
-                });
-            }
-            var min_allowed_prob = 10;
-            var max_allowed_prob = 50;
+                function onEachFeature(feature, layer) {
+                    layer.on({
+                        mouseover: highlightFeature,
+                        mouseout: resetHighlight
+                    });
+                }
+                var min_allowed_prob = 10;
+                var max_allowed_prob = 50;
 
-            max_prob = Math.min(Math.max(max_prob, min_allowed_prob), max_allowed_prob);
 
-            prob_lines_layer = L.geoJson(list_lines,{
-                style: function(feature) {
-                        return {color: getColor(feature.properties.prob*100/max_prob), weight:5}
-                },
-                onEachFeature: onEachFeature
-            }).addTo(map);
 
-            var list_marker = [];
-            for(var key in $scope.prob_input) {
-                if (key != -1) {
-                    var node = $scope.prob_input[key];
-                    if (node['prob'] != 0) {
-                        var marker = L.marker([node['lat'], node['lng']],{color:getColor(node['prob']*100/max_prob)});
-                        marker.bindPopup("Probability to zone "+key +" is "+node['prob']/100).openPopup();
-                        list_marker.push(marker);
+                prob_lines_layer = L.geoJson(list_lines,{
+                    style: function(feature) {
+                            return {color: getColor(feature.properties.prob*100/max_prob), weight:5}
+                    },
+                    onEachFeature: onEachFeature
+                }).addTo(map);
+
+                var list_marker = [];
+                for(var key in $scope.prob_input) {
+                    if (key != -1) {
+                        var node = $scope.prob_input[key];
+                        if (node['prob'] != 0) {
+                            var marker = L.marker([node['lat'], node['lng']],{color:getColor(node['prob']*100/max_prob)});
+                            marker.bindPopup("Probability to zone "+key +" is "+node['prob']/100).openPopup();
+                            list_marker.push(marker);
+                        }
                     }
                 }
-            }
-            var source_marker = L.marker([source_lat,source_lng],{color:'black'});
-            source_marker.bindPopup("Source Zone :"+$scope.sourceZone);
-            list_marker.push(source_marker);
-            prob_marker_layer = L.featureGroup(list_marker).addTo(map);
-            prob_info = L.control();
+                var source_marker = L.marker([source_lat,source_lng],{color:'black'});
+                source_marker.bindPopup("Source Zone :"+$scope.sourceZone);
+                list_marker.push(source_marker);
+                prob_marker_layer = L.featureGroup(list_marker).addTo(map);
 
-            prob_info.onAdd = function (map) {
-                this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
-                this.update();
-                return this._div;
-            };
+                map.panTo(new L.LatLng(source_lat,source_lng));
+                map.setZoom(13);
+                prob_info = L.control();
 
-// method that we will use to update the control based on feature properties passed
-            prob_info.update = function (props) {
-                this._div.innerHTML = '<h4>Probability of moving: </h4>' +  (props ?
-                    'From '+$scope.sourceZone+' to '+props.zid+' is <b>'+ props.prob/100 + '</b>'
-                        : 'Hover over a line');
-            };
+                prob_info.onAdd = function (map) {
+                    this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
+                    this.update();
+                    return this._div;
+                };
 
-            prob_info.addTo(map);
+    // method that we will use to update the control based on feature properties passed
+                prob_info.update = function (props) {
+                    this._div.innerHTML = '<h4>Probability of moving: </h4>' +  (props ?
+                        'From '+$scope.sourceZone+' to '+props.zid+' is <b>'+ props.prob/100 + '</b>'
+                            : 'Hover over a line');
+                };
 
-            prob_legend = L.control({position: 'bottomright'});
+                prob_info.addTo(map);
 
-            prob_legend.onAdd = function (map) {
+                prob_legend = L.control({position: 'bottomright'});
 
-                var div = L.DomUtil.create('div', 'info legend'),
-                    grades = [0, 20, 40, 60, 80],
-                    labels = [];
+                prob_legend.onAdd = function (map) {
 
-                // loop through our density intervals and generate a label with a colored square for each interval
-                for (var i = 0; i < grades.length; i++) {
-                    div.innerHTML += (i==0? '<h4> Probabilities</h4>' :' ')+
-                        '<i style="background:' + getColor(grades[i] + 1) + '"></i> ' +
-                        Math.floor((grades[i]*max_prob)/100)/100  + (grades[i + 1] ? '&ndash;' + Math.floor((grades[i + 1]*max_prob)/100)/100 + '<br>' : '+');
-                }
+                    var div = L.DomUtil.create('div', 'info legend'),
+                        grades = [0, 20, 40, 60, 80],
+                        labels = [];
 
-                return div;
-            };
-            prob_legend.addTo(map);
+                    // loop through our density intervals and generate a label with a colored square for each interval
+                    for (var i = 0; i < grades.length; i++) {
+                        div.innerHTML += (i==0? '<h4> Probabilities</h4>' :' ')+
+                            '<i style="background:' + getColor(grades[i] + 1) + '"></i> ' +
+                            Math.floor((grades[i]*max_prob)/100)/100  + (grades[i + 1] ? '&ndash;' + Math.floor((grades[i + 1]*max_prob)/100)/100 + '<br>' : '+');
+                    }
+
+                    return div;
+                };
+                prob_legend.addTo(map);
 
         })
         $('#probabilityModal').modal('hide');
@@ -291,8 +316,8 @@ app.controller("myCtrl", function($scope, service,$rootScope,$location,$window) 
         $scope.clear();
         $scope.mapTitle = "Observed Demand Heat Map";
         service.observedDemandHeatMap(info).success(function(response){
-            $scope.clear();
             input = response.data;
+            map.setZoom(12);
             var idx =0;
             zones_dict = {}
             var list_rectangles = [];
@@ -528,11 +553,46 @@ app.controller("myCtrl", function($scope, service,$rootScope,$location,$window) 
     }
 
 
-    $scope.bookingPattern = function(info){
+    $scope.availabilityPattern = function(info){
         $scope.sourceZone = undefined;
         $scope.clear();
-        $scope.mapTitle = "Booking Pattern"
-        service.availabilityPatern(info).success(function(data){
+        $scope.mapTitle = "Availability Pattern"
+        service.availabilityPattern(info).success(function(response){
+            var list_Of_files = response.data;
+            map.setZoom(12);
+            if(list_Of_files == false){
+                alert('No data present for the provided date and time');
+                return;
+            }
+            if(list_Of_files != -1){
+                var counter=0;
+                pattern_info = L.control();
+
+                pattern_info.onAdd = function (map) {
+                    this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
+                    this.update();
+                    return this._div;
+                };
+
+    // method that we will use to update the control based on feature properties passed
+                pattern_info.update = function (year,mon,day,hour,min, len) {
+                    this._div.innerHTML = '<h4>Available Cars: '+len+'</h4>' +
+                        '<b>Time' + hour+":"+min + '</b> Date: '+ day+"/"+mon+"/"+year;
+                };
+                pattern_info.addTo(map);
+                pattern_info.update(0,0,0,0,0,0);
+                $scope.drawInterval =setInterval(function(){
+                    drawPoints(list_Of_files[counter], info.type);
+                    if(counter == list_Of_files.length-1){
+                        clearInterval($scope.drawInterval);
+                        $scope.drawInterval = undefined;
+                    }
+                    counter++;
+                },1000);
+            } else {
+                alert('Invalid input data');
+            }
+
 
 
         })
@@ -540,6 +600,35 @@ app.controller("myCtrl", function($scope, service,$rootScope,$location,$window) 
     }
 
 
+
+    function drawPoints(filename, type){
+
+            service.getJson(filename,type).success(function(response){
+
+                list_location = response.data;
+                if(list_location != -1){
+                    if(map.hasLayer(patt_points_layer)){
+                        map.removeLayer(patt_points_layer);
+                    }
+                    name = filename.slice(0,-4);
+                    list_names = name.split("\\");
+                    dates = list_names[list_names.length-1]
+                    time = dates.split("_");
+                    pattern_info.update(time[1],time[2],time[3],time[4],time[5], list_location.length);
+                    var list_points = []
+                    for (var x=0;x<list_location.length;x++){
+                        var circle = L.circle([list_location[x]['lat'], list_location[x]['lng']], 3, {
+                            color: 'black',
+                            fillColor: 'black',
+                            fillOpacity: 0.5
+                        });
+                        list_points.push(circle);
+                    }
+                    patt_points_layer = L.featureGroup(list_points).addTo(map);
+                }
+            })
+
+    }
 
 //Garching 1
 

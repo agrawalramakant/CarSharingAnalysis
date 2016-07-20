@@ -11,6 +11,7 @@ from sqlalchemy import create_engine
 import os
 import database as db
 import zone_center as zc
+import json
 
 def getRecords(start_Date,end_Date = None,start_Time = None,end_Time = None,zone_id=None,carType=None):
     if zone_id is None:
@@ -73,7 +74,7 @@ def getBookingRecords(start_Date,end_Date = None,start_Time = None,end_Time = No
 
 def getpath(time):
     temp = time.split('_')
-    path = '..' + os.sep + '..' + os.sep + 'archive' + os.sep + temp[0] + os.sep + temp[1] + os.sep + temp[2] + os.sep
+    path = '..'  + os.sep + 'archive' + os.sep + temp[0] + os.sep + temp[1] + os.sep + temp[2] + os.sep
     return path
 
 def movingPattern(start_Date,end_Date,start_Time,end_Time):
@@ -93,14 +94,57 @@ def getModifiedDateTime(date, time):
                   + '_' + start_hour + '_' + start_min
     return modifiedDateTime
 
+def getBiggerdate(src, dest):
+    src = src.rstrip('.txt')
+    src_list = src.split("_")
+
+    dest = dest.rstrip('.txt')
+    dest_list = dest.split("_")
+
+    if(dest_list[4]>src_list[4]) or ((dest_list[4] == src_list[4]) and (dest_list[5]>src_list[5])):
+        return True
+    else:
+        return False
+
+
 def getAllfiles(start_Date, start_Time, end_Time, end_Date=None, carType = None):
 
     actualStart = getModifiedDateTime(str(start_Date),str(start_Time))
-    print actualStart
-    path = getpath(actualStart)
-    if os.path.exists(path):
+    actualEnd = getModifiedDateTime(str(end_Date), str(end_Time))
+    startFile = u'datafile' + '_' +actualStart+'.txt'
+
+    endFile =  u'datafile' + '_' +actualEnd+'.txt'
+
+    search_dir = getpath(actualStart)
+
+    if os.path.exists(search_dir):
         print ("exists")
-    listOfFile = os.listdir(path)
-    for file in listOfFile:
-        print (file)
-    return None
+
+
+        files = os.listdir(search_dir)
+        filteredFiles = []
+        for file in files:
+            if getBiggerdate(startFile, file) and getBiggerdate(file,endFile):
+                filteredFiles.append(file)
+
+        filteredFiles = [os.path.join(os.path.abspath(search_dir), f) for f in filteredFiles]  # add path to each file
+        filteredFiles = sorted(filteredFiles, key=lambda x: os.path.getmtime(x))
+
+        if(len(filteredFiles) > 0):
+            return filteredFiles
+        else:
+            return None
+    else:
+        return None
+
+def getLatLngJson(filename, carType=None):
+    outputJson = []
+    with open(filename) as data_file:
+        jsonData = json.load(data_file)
+        for entry in list(jsonData):
+            if carType is None:
+                outputJson.append({'lat': entry['loc'][0], 'lng': entry['loc'][1]})
+            else:
+                if entry['id'].startswith(carType):
+                    outputJson.append({'lat': entry['loc'][0], 'lng': entry['loc'][1]})
+    return outputJson
